@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TABC License Application Tracker | OpeningWire</title>
+<meta name="description" content="Track new TABC liquor-license applications across Texas the week they&#x27;re filed — weeks ahead of a venue&#x27;s public opening.">
+<link rel="canonical" href="https://openingwire.com/tabc-license-application-tracker/">
+<!-- seo-pages:v1 -->
+<style>
+:root{--ink:#141a24;--sub:#5a6577;--acc:#0e6ef2;--acc2:#0a54ba;--bg:#ffffff;--soft:#f4f6fa;--line:#e5e9f0;--good:#0d8a4f}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+header{padding:20px 0;border-bottom:1px solid var(--line)}
+header .wrap{display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:800;font-size:1.25rem;letter-spacing:-.02em}
+.logo span{color:var(--acc)}
+nav a{color:var(--sub);text-decoration:none;margin-left:22px;font-size:.95rem}
+nav a:hover{color:var(--ink)}
+.hero{padding:72px 0 56px;text-align:center}
+.hero h1{font-size:2.6rem;line-height:1.15;letter-spacing:-.03em;max-width:760px;margin:0 auto}
+.hero h1 em{font-style:normal;color:var(--acc)}
+.hero p.lead{color:var(--sub);font-size:1.2rem;max-width:640px;margin:20px auto 0}
+.cta{display:inline-block;background:var(--acc);color:#fff;text-decoration:none;font-weight:700;padding:14px 28px;border-radius:8px;margin-top:28px;font-size:1.05rem}
+.cta:hover{background:var(--acc2)}
+.subnote{color:var(--sub);font-size:.9rem;margin-top:12px}
+section{padding:56px 0}
+section.soft{background:var(--soft)}
+h2{font-size:1.7rem;letter-spacing:-.02em;text-align:center;margin-bottom:8px}
+.sectionsub{color:var(--sub);text-align:center;max-width:620px;margin:0 auto 36px}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:26px}
+.card h3{font-size:1.05rem;margin-bottom:8px}
+.card p{color:var(--sub);font-size:.95rem}
+.step{font-weight:800;color:var(--acc);font-size:.85rem;letter-spacing:.06em}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:.92rem}
+th{background:var(--ink);color:#fff;text-align:left;padding:10px 14px;font-weight:600}
+td{padding:10px 14px;border-top:1px solid var(--line)}
+.tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:.78rem;font-weight:600}
+.tag.r{background:#e7f2ec;color:var(--good)}
+.tag.b{background:#ede9fc;color:#5b3fd4}
+.tag.new{background:#e8f0fe;color:var(--acc)}
+.pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:stretch}
+.plan{background:#fff;border:1px solid var(--line);border-radius:12px;padding:30px;display:flex;flex-direction:column}
+.plan.feat{border:2px solid var(--acc);position:relative}
+.plan .badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--acc);color:#fff;font-size:.75rem;font-weight:700;padding:3px 12px;border-radius:99px}
+.plan h3{font-size:1.1rem}
+.price{font-size:2.3rem;font-weight:800;margin:10px 0 2px}
+.price small{font-size:1rem;color:var(--sub);font-weight:400}
+.plan ul{list-style:none;margin:18px 0 24px;flex:1}
+.plan li{padding:6px 0;color:var(--sub);font-size:.94rem}
+.plan li::before{content:"✓  ";color:var(--good);font-weight:700}
+.plan .cta{margin-top:0;text-align:center}
+.faq{max-width:720px;margin:0 auto}
+.faq h3{font-size:1.02rem;margin:22px 0 6px}
+.faq p{color:var(--sub);font-size:.95rem}
+footer{border-top:1px solid var(--line);padding:32px 0;color:var(--sub);font-size:.9rem}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer a{color:var(--sub)}
+@media(max-width:760px){.cols,.pricing{grid-template-columns:1fr}.hero h1{font-size:2rem}}
+
+.seo-intro{max-width:70ch}
+.seo-cta{margin:2rem 0;font-weight:600}
+.seo-faq h3{margin-bottom:.25rem}
+.seo-teaser td{font-style:italic}
+.seo-features{margin:2rem 0}
+.seo-feature{margin-bottom:1.25rem;max-width:70ch}
+.seo-feature h3{margin-bottom:.25rem}
+
+</style>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "How early does this catch a new restaurant?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "At the point the TABC application is filed \u2014 typically weeks to months before the license is issued and long before opening day."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Do you track applications that get withdrawn or denied?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Yes. Tracked applications are periodically re-checked against the public feed, and ones that are no longer live are removed rather than staying in the feed as a stale lead."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Can I get the full list of applications in my territory?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "OpeningWire delivers every pending application and newly issued license for your metro as a weekly CSV. Plans start at $99/month; see pricing on the homepage."
+   }
+  }
+ ]
+}
+</script>
+</head>
+<body>
+<main>
+  <p><a href="/">&larr; OpeningWire</a></p>
+  <h1>TABC License Application Tracker — New Filings Every Week</h1>
+  <p class="seo-intro">Before a restaurant or bar opens in Texas, it almost always files a TABC license application first — sometimes months before construction finishes or a sign goes up. OpeningWire tracks these applications from the moment they&#x27;re filed, checking Texas&#x27;s public TABC pending-applications feed daily and surfacing new filings the same week they appear. That&#x27;s weeks or months of lead time before a Restaurant Activity Report or a search engine would ever surface the location, because those only catch a venue once its license is fully issued. For suppliers who want the earliest possible signal — before a competitor even knows the account exists — this is the page. Below is a live sample of the newest applications filed across Texas&#x27;s major metros this week, tracked automatically from public state filings. Applications that stall out — withdrawn, denied, or simply abandoned — are checked periodically and dropped from the feed, so what you see is a live tracker of applications still moving toward a license, not a growing pile of dead leads.</p>
+  <table>
+    <tr><th>Venue</th><th>Type</th><th>Status</th><th>City</th><th>Metro</th><th>Filed</th></tr>
+      <!-- SAMPLE:START -->
+      <tr><td>AC Hotel By Marriott Mckinney</td><td><span class="tag r">Restaurant</span></td><td><span class="tag pending">Application Filed</span></td><td>Mckinney</td><td>DFW</td><td>Jul 24</td></tr>
+      <tr><td>Guerra's Mexican Grill</td><td><span class="tag r">Restaurant</span></td><td><span class="tag pending">Application Filed</span></td><td>Houston</td><td>Houston</td><td>Jul 24</td></tr>
+      <tr><td>Home Slice Pizza</td><td><span class="tag r">Restaurant</span></td><td><span class="tag pending">Application Filed</span></td><td>Houston</td><td>Houston</td><td>Jul 24</td></tr>
+      <tr><td>IL Gusto Italian Restaurant</td><td><span class="tag r">Restaurant</span></td><td><span class="tag pending">Application Filed</span></td><td>Fort Worth</td><td>DFW</td><td>Jul 24</td></tr>
+      <tr><td>MOD Pizza</td><td><span class="tag r">Restaurant</span></td><td><span class="tag pending">Application Filed</span></td><td>Prosper</td><td>DFW</td><td>Jul 24</td></tr>
+      <tr><td>Pharaohs Kitchen</td><td><span class="tag r">Restaurant</span></td><td><span class="tag pending">Application Filed</span></td><td>Houston</td><td>Houston</td><td>Jul 24</td></tr>
+      <tr><td>Sunrise Cafe</td><td><span class="tag r">Restaurant</span></td><td><span class="tag pending">Application Filed</span></td><td>Northlake</td><td>DFW</td><td>Jul 24</td></tr>
+      <tr><td>Taqueria De Tierra Caliente</td><td><span class="tag r">Restaurant</span></td><td><span class="tag pending">Application Filed</span></td><td>Houston</td><td>Houston</td><td>Jul 24</td></tr>
+      <tr><td>Texas BBQ & Barstools</td><td><span class="tag r">Restaurant</span></td><td><span class="tag pending">Application Filed</span></td><td>San Antonio</td><td>San Antonio</td><td>Jul 24</td></tr>
+      <tr><td>The Fruteria</td><td><span class="tag b">Bar / Club</span></td><td><span class="tag pending">Application Filed</span></td><td>San Antonio</td><td>San Antonio</td><td>Jul 24</td></tr>
+      <tr><td>TXC Farm Fresh Texas Chicken</td><td><span class="tag r">Restaurant</span></td><td><span class="tag pending">Application Filed</span></td><td>Spring</td><td>Houston</td><td>Jul 24</td></tr>
+      <tr><td>Adrian's Mexican Food</td><td><span class="tag r">Restaurant</span></td><td><span class="tag pending">Application Filed</span></td><td>Houston</td><td>Houston</td><td>Jul 23</td></tr>
+      <tr><td>Cheladas Y Mas Restaurant</td><td><span class="tag r">Restaurant</span></td><td><span class="tag pending">Application Filed</span></td><td>Pasadena</td><td>Houston</td><td>Jul 23</td></tr>
+      <tr><td>DFW Curling Club</td><td><span class="tag b">Bar / Club</span></td><td><span class="tag pending">Application Filed</span></td><td>Irving</td><td>DFW</td><td>Jul 23</td></tr>
+      <tr><td>JAM And Toast</td><td><span class="tag r">Restaurant</span></td><td><span class="tag pending">Application Filed</span></td><td>Frisco</td><td>DFW</td><td>Jul 23</td></tr>
+      <tr class="seo-teaser"><td colspan="6">+ 175 more applications filed this week — subscribers see everything</td></tr>
+      <!-- SAMPLE:END -->
+  </table>
+  <p class="seo-cta"><a href="/#pricing">Get the full statewide feed every Monday
+  — plans from $99/mo &rarr;</a></p>
+  <section class="seo-features">
+    <div class="seo-feature"><h3>Tracked from day one</h3><p>The pipeline checks the public TABC pending-applications feed daily, so a new filing shows up the same week — not weeks later once a license is issued.</p></div>
+    <div class="seo-feature"><h3>Stale filings cleared automatically</h3><p>Applications that are withdrawn, denied, or abandoned are periodically re-checked and removed from the live feed rather than lingering as a false lead.</p></div>
+    <div class="seo-feature"><h3>Transitions tracked too</h3><p>When a tracked application is granted its license, that transition is recorded — so you see the full lifecycle, not just a single snapshot.</p></div>
+  </section>
+  <section class="seo-faq">
+    <h2>Frequently asked questions</h2>
+    <div class="seo-faq-item"><h3>How early does this catch a new restaurant?</h3><p>At the point the TABC application is filed — typically weeks to months before the license is issued and long before opening day.</p></div>
+    <div class="seo-faq-item"><h3>Do you track applications that get withdrawn or denied?</h3><p>Yes. Tracked applications are periodically re-checked against the public feed, and ones that are no longer live are removed rather than staying in the feed as a stale lead.</p></div>
+    <div class="seo-faq-item"><h3>Can I get the full list of applications in my territory?</h3><p>OpeningWire delivers every pending application and newly issued license for your metro as a weekly CSV. Plans start at $99/month; see pricing on the homepage.</p></div>
+  </section>
+</main>
+<footer>
+  <p><a href="/">Home</a> · <a href="/terms.html">Terms</a> ·
+  <a href="/privacy.html">Privacy</a> · OpeningWire — know before they open.</p>
+</footer>
+</body>
+</html>
