@@ -66,7 +66,7 @@ flowchart LR
 
 | External system | Role | Touched by |
 |---|---|---|
-| scraper-business repo (pipeline) | Pushes weekly sample rows into every marker page — per-metro, statewide, or pending-tracker rows per page — and stamps changed pages' sitemap lastmod (its pipeline/site_sample.py PAGE_PROFILES, weekly-report workflow, authenticated by a SITE_PUSH_TOKEN secret held there) | sample-marker regions in `index.html` and each landing page; `sitemap.xml` |
+| scraper-business repo (pipeline) | Generates the seven SEO landing pages and refreshes every page's sample rows weekly (its pipeline/site_sample.py + pipeline/seo_pages.py, weekly-report workflow, authenticated by a SITE_PUSH_TOKEN secret held there); a manual dispatch opens a PR here instead of pushing | sample-marker regions in `index.html` and each landing page; `sitemap.xml`, `robots.txt`, homepage footer link blocks |
 | GitHub Pages | Hosting; serves the `main` branch as-is | `CNAME` (custom domain) |
 | Cloudflare DNS | Apex/www CNAME to clear-mind-systems.github.io | records documented in `README.md` |
 | Stripe | Hosted checkout; no code integration | three buy.stripe.com `href`s in `index.html` `id="pricing"` |
@@ -124,7 +124,7 @@ loads; every page inlines its CSS.
 
 | Interface | Consumer | Defined in |
 |---|---|---|
-| `<!-- SAMPLE:START -->` / `<!-- SAMPLE:END -->` marker regions | The pipeline's injector (pipeline/site_sample.py in scraper-business), which replaces everything between the markers per page profile and fails loudly if an existing page loses its markers | `index.html` and every landing page |
+| `<!-- SAMPLE:START -->` / `<!-- SAMPLE:END -->` marker regions | The pipeline's injector (pipeline/site_sample.py in scraper-business), which replaces everything between the markers with rows appropriate to that page and fails loudly if a page loses its markers | `index.html` and every landing page |
 | Three Stripe payment-link `href`s (founding/standard/multi-territory) | Visitors; owner swaps URLs per `README.md` | `index.html` `id="pricing"` |
 | Sample-request mailto (founders@, metro in body template) | Visitors → owner's MXRoute inbox | `index.html` hero CTA |
 | Public URL set | Search engines, subscribers | `sitemap.xml` |
@@ -155,7 +155,7 @@ sequenceDiagram
     participant R as this repo (main)
     participant P as GitHub Pages
     W->>R: checkout with SITE_PUSH_TOKEN
-    W->>W: render per-profile rows from pipeline DB; inject every marker page; stamp sitemap lastmod
+    W->>W: render rows from pipeline DB; refresh homepage + regenerate SEO pages; update sitemap
     Note over W,R: push only when the injector reports CHANGED
     W->>R: commit "weekly sample refresh" + push
     R->>P: Pages auto-build on push
@@ -169,13 +169,18 @@ checkout (payment links in `index.html`); **sample request** is a prefilled
 mailto to founders@, answered by the owner using the pipeline repo's
 samples CSVs and reply template (see that repo's outreach/ directory).
 
-All eight marker pages are refreshed by the weekly job (pipeline change
-`refresh-all-site-sample-pages`, 2026-07-28): the four metro pages get
-metro-filtered licensed rows, the tracker page gets pending applications, the
-rest get statewide licensed rows, and changed pages' `sitemap.xml` lastmod is
-stamped in the same commit. Adding or removing a landing page must be
-mirrored in the pipeline's page-profile map, or the new page silently won't
-refresh (removal is safe — the injector skips absent pages with a warning).
+All eight marker pages are refreshed by the weekly job, by two cooperating
+pipeline modules: site_sample.py renders the homepage rows and owns the
+marker-scoped injection primitive, and seo_pages.py (Work Item 7) generates
+and refreshes the seven landing pages — metro-filtered rows for the four metro
+pages, pending applications for the tracker page — plus the footer link blocks,
+`sitemap.xml` and `robots.txt`.
+
+The seven landing pages are **generated artifacts**, not hand-maintained: each
+carries a `<!-- seo-pages:v1 -->` template-version marker, and its shell is
+rewritten whenever the pipeline bumps that version. Edit them here only for
+one-off fixes you expect to be overwritten; durable changes belong in the
+pipeline's page templates.
 
 ## 8. Deployment & operations
 
