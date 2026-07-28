@@ -17,7 +17,7 @@ which has its own ARCHITECTURE.md).
   new-restaurant/TABC queries via SEO landing pages.
 - **Quality attributes, prioritized**: (1) zero operations — no build step, no
   runtime JavaScript, nothing to break unattended; (2) $0 hosting — GitHub
-  Pages + Cloudflare DNS (`README.md`); (3) freshness signal — the homepage
+  Pages + Cloudflare DNS (`README.md`); (3) freshness signal — every page's
   sample table is refreshed weekly by the pipeline bot; (4) SEO.
 - **Hard constraints**: static files only (GitHub Pages, no server code); every
   page is fully self-contained HTML with inline CSS; content changes arrive as
@@ -66,7 +66,7 @@ flowchart LR
 
 | External system | Role | Touched by |
 |---|---|---|
-| scraper-business repo (pipeline) | Pushes weekly sample rows between the markers in `index.html` (its pipeline/site_sample.py, weekly-report workflow, authenticated by a SITE_PUSH_TOKEN secret held there) | `index.html` sample-marker region |
+| scraper-business repo (pipeline) | Pushes weekly sample rows into every marker page — per-metro, statewide, or pending-tracker rows per page — and stamps changed pages' sitemap lastmod (its pipeline/site_sample.py PAGE_PROFILES, weekly-report workflow, authenticated by a SITE_PUSH_TOKEN secret held there) | sample-marker regions in `index.html` and each landing page; `sitemap.xml` |
 | GitHub Pages | Hosting; serves the `main` branch as-is | `CNAME` (custom domain) |
 | Cloudflare DNS | Apex/www CNAME to clear-mind-systems.github.io | records documented in `README.md` |
 | Stripe | Hosted checkout; no code integration | three buy.stripe.com `href`s in `index.html` `id="pricing"` |
@@ -81,7 +81,7 @@ flowchart LR
 | Metro SEO capture ("new restaurants in X") | `new-restaurants-houston/index.html`, `new-restaurants-dallas/index.html`, `new-restaurants-austin/index.html`, `new-restaurants-san-antonio/index.html` | Metro-filtered sample rows, JSON-LD, canonical URLs; marked `seo-pages:v1` |
 | Intent SEO capture | `pre-opening-restaurant-leads-texas/index.html`, `tabc-license-application-tracker/index.html`, `restaurant-activity-report-alternative/index.html` | Product-intent and competitor-alternative queries |
 | Legal | `privacy.html`, `terms.html` | Linked from footers |
-| Crawler plumbing | `robots.txt`, `sitemap.xml` | Sitemap lists all 8 pages; lastmod maintained by hand |
+| Crawler plumbing | `robots.txt`, `sitemap.xml` | Sitemap lists all 8 pages; lastmod auto-stamped by the weekly injection for refreshed pages |
 
 ## 4. Containers
 
@@ -124,7 +124,7 @@ loads; every page inlines its CSS.
 
 | Interface | Consumer | Defined in |
 |---|---|---|
-| `<!-- SAMPLE:START -->` / `<!-- SAMPLE:END -->` marker region | The pipeline's injector (pipeline/site_sample.py in scraper-business), which replaces everything between the markers and raises if they're missing | `index.html` (and, currently unrefreshed, each landing page — see §7 debt) |
+| `<!-- SAMPLE:START -->` / `<!-- SAMPLE:END -->` marker regions | The pipeline's injector (pipeline/site_sample.py in scraper-business), which replaces everything between the markers per page profile and fails loudly if an existing page loses its markers | `index.html` and every landing page |
 | Three Stripe payment-link `href`s (founding/standard/multi-territory) | Visitors; owner swaps URLs per `README.md` | `index.html` `id="pricing"` |
 | Sample-request mailto (founders@, metro in body template) | Visitors → owner's MXRoute inbox | `index.html` hero CTA |
 | Public URL set | Search engines, subscribers | `sitemap.xml` |
@@ -155,7 +155,7 @@ sequenceDiagram
     participant R as this repo (main)
     participant P as GitHub Pages
     W->>R: checkout with SITE_PUSH_TOKEN
-    W->>W: render rows from pipeline DB; inject between SAMPLE markers in index.html
+    W->>W: render per-profile rows from pipeline DB; inject every marker page; stamp sitemap lastmod
     Note over W,R: push only when the injector reports CHANGED
     W->>R: commit "weekly sample refresh" + push
     R->>P: Pages auto-build on push
@@ -169,12 +169,13 @@ checkout (payment links in `index.html`); **sample request** is a prefilled
 mailto to founders@, answered by the owner using the pipeline repo's
 samples CSVs and reply template (see that repo's outreach/ directory).
 
-**Known debt** — the 7 SEO landing pages contain sample-marker regions
-with metro-filtered rows, but the weekly job injects only the root
-`index.html` (its workflow passes a single path). Landing-page rows are
-therefore frozen at page-creation time and drift stale; `sitemap.xml` lastmod
-values are also hand-set. Either extend the weekly injection to all marker
-pages or drop the markers from the landing pages.
+All eight marker pages are refreshed by the weekly job (pipeline change
+`refresh-all-site-sample-pages`, 2026-07-28): the four metro pages get
+metro-filtered licensed rows, the tracker page gets pending applications, the
+rest get statewide licensed rows, and changed pages' `sitemap.xml` lastmod is
+stamped in the same commit. Adding or removing a landing page must be
+mirrored in the pipeline's page-profile map, or the new page silently won't
+refresh (removal is safe — the injector skips absent pages with a warning).
 
 ## 8. Deployment & operations
 
