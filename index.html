@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>OpeningWire — Know before they open. New Texas restaurant &amp; bar leads, weekly.</title>
-<meta name="description" content="Weekly feeds of new restaurant and bar openings in Texas, built from liquor license applications and public filings. For distributors, POS resellers, and suppliers.">
+<title>OpeningWire — Texas restaurant &amp; bar leads from TABC records, weekly.</title>
+<meta name="description" content="Weekly Texas restaurant and bar leads identified through TABC liquor-license applications and issuances. For distributors, POS resellers, and suppliers.">
+<link rel="canonical" href="https://openingwire.com/">
 <style>
-:root{--ink:#141a24;--sub:#5a6577;--acc:#0e6ef2;--acc2:#0a54ba;--bg:#ffffff;--soft:#f4f6fa;--line:#e5e9f0;--good:#0d8a4f}
+:root{--ink:#141a24;--sub:#5a6577;--acc:#0b5fcc;--acc2:#0a54ba;--bg:#ffffff;--soft:#f4f6fa;--line:#e5e9f0;--good:#08683c}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6}
 .wrap{max-width:1040px;margin:0 auto;padding:0 24px}
@@ -57,6 +58,23 @@ footer{border-top:1px solid var(--line);padding:32px 0;color:var(--sub);font-siz
 footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 footer a{color:var(--sub)}
 @media(max-width:760px){.cols,.pricing{grid-template-columns:1fr}.hero h1{font-size:2rem}}
+
+/* Static sample presentation; the producer owns the SAMPLE row regions. */
+a{color:var(--acc2)}
+a:focus-visible,.table-scroll:focus-visible{outline:3px solid var(--acc2);outline-offset:4px}
+.sample-freshness{max-width:760px;margin:24px auto;padding:20px;background:var(--soft);border:1px solid var(--sub);border-radius:8px}
+.sample-freshness h3{font-size:1.05rem;margin-bottom:8px}
+.sample-freshness p+p{margin-top:12px}
+.sample-freshness time{font-variant-numeric:tabular-nums}
+.sample-dates{color:var(--sub);max-width:760px;margin:16px auto}
+.table-scroll{max-width:100%;overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+.table-scroll table{min-width:720px;border:0;border-radius:0}
+.table-scroll caption{text-align:left;padding:12px 14px;font-weight:600;color:var(--ink);background:var(--soft)}
+.table-scroll td:first-child{min-width:180px;max-width:300px;overflow-wrap:anywhere}
+.table-scroll td:last-child{min-width:120px}
+.seo-teaser{display:none} /* Legacy promotional text is not a freshness signal. */
+.metro-links{max-width:1040px;margin:16px auto 0;padding:0 24px}
+@media(max-width:760px){header .wrap{flex-wrap:wrap;gap:12px}nav{display:flex;flex-wrap:wrap;gap:10px 18px}nav a{margin:0}.sample-freshness{padding:16px}}
 </style>
 </head>
 <body>
@@ -73,33 +91,43 @@ footer a{color:var(--sub)}
   </div>
 </header>
 
+<main>
 <section class="hero">
   <div class="wrap">
-    <h1>Every new Texas restaurant &amp; bar — <em>before the doors open.</em></h1>
-    <p class="lead">OpeningWire monitors liquor license applications and public filings daily, and delivers a weekly feed of upcoming restaurant and bar openings in your territory. Reach them before your competitors know they exist.</p>
-    <a class="cta" href="mailto:founders@openingwire.com?subject=Free%20sample%20week%20—%20OpeningWire&body=Send%20me%20this%20week's%20sample%20for%20(metro):%20">Get This Week's Sample — Free</a>
-    <p class="subnote">Real data, this week, your metro. No card required.</p>
+    <h1>Texas restaurant &amp; bar leads — <em>from public license records.</em></h1>
+    <p class="lead">OpeningWire turns Texas Alcoholic Beverage Commission (TABC) liquor-license applications and issuances into a weekly lead feed for your territory. Explore restaurant and bar prospects with license records to guide your research.</p>
+    <a class="cta" href="mailto:founders@openingwire.com?subject=OpeningWire%20sample%20request&amp;body=Please%20send%20an%20available%20sample%20for%20my%20metro%3A%20">Request a Free Sample</a>
+    <p class="subnote">Ask for an available sample for your metro. No card required.</p>
   </div>
 </section>
 
 <section class="soft">
   <div class="wrap">
     <h2>How it works</h2>
-    <p class="sectionsub">New restaurants file paperwork weeks or months before opening day. We watch all of it, so you don't have to.</p>
+    <p class="sectionsub">TABC applications and issued licenses can help identify prospects. They do not confirm an opening date or cover restaurants without liquor licenses.</p>
     <div class="cols">
-      <div class="card"><div class="step">STEP 1</div><h3>We monitor public records daily</h3><p>Liquor license applications (TABC), new business filings, and licensing status changes across Texas — checked every morning, automatically.</p></div>
-      <div class="card"><div class="step">STEP 2</div><h3>We filter and verify</h3><p>Every record is deduplicated, classified (restaurant vs. bar vs. store), and tracked through its lifecycle — from first application to licensed-and-about-to-open.</p></div>
-      <div class="card"><div class="step">STEP 3</div><h3>You get a weekly feed</h3><p>Every Monday: a clean CSV + summary of every upcoming opening in your metro. Name, address, stage, and dates. Ready for your sales team.</p></div>
+      <div class="card"><div class="step">STEP 1</div><h3>We follow TABC license records</h3><p>Texas liquor-license applications and issuances provide the source records for the restaurant and bar lead feed.</p></div>
+      <div class="card"><div class="step">STEP 2</div><h3>We organize the records</h3><p>The pipeline classifies and deduplicates records, with application and license status to support your own follow-up.</p></div>
+      <div class="card"><div class="step">STEP 3</div><h3>You get a weekly feed</h3><p>Weekly CSV + summary for your selected territory, with Monday delivery scheduled. Name, address, stage, and record dates for your sales team.</p></div>
     </div>
   </div>
 </section>
 
 <section id="sample">
   <div class="wrap">
-    <h2>Live sample — licensed this week</h2>
-    <p class="sectionsub">A few of the venues that appeared in our feeds in the last few days. Subscribers saw these the morning after the state did.</p>
+    <h2 id="sample-title">Sample license records</h2>
+    <p class="sectionsub">Selected TABC license records illustrate the feed format. License dates and status labels describe the source records; they do not establish when a venue opened.</p>
+    <div class="sample-freshness" id="sample-freshness" aria-labelledby="sample-status-title">
+      <h3 id="sample-status-title">Sample refresh time unknown</h3>
+      <p>A verified source-refresh time for this table is unavailable. Weekly delivery is the subscription schedule, not a statement that this sample is current. Records may be out of date; confirm current license status and opening plans.</p>
+      <p>Archive reference: the <time datetime="2026-08-03">August 3, 2026</time> snapshot contained TABC license issue dates from July 30–31, 2026. This archive reference is not a source-refresh time or an opening date.</p>
+      <p><a href="mailto:founders@openingwire.com?subject=OpeningWire%20sample%20request&amp;body=Please%20send%20an%20available%20sample%20for%20my%20metro%3A%20">Request an available sample for your metro</a>.</p>
+    </div>
+    <p class="sample-dates" id="sample-dates">Licensed means the TABC license issue date, not the venue’s opening date or the feed’s update time. Status labels reflect the sampled records. TABC records do not cover every restaurant. Scroll the table horizontally on smaller screens.</p>
+    <div class="table-scroll" role="region" aria-labelledby="sample-title" aria-describedby="sample-dates" tabindex="0">
     <table>
-      <tr><th>Venue</th><th>Type</th><th>Status</th><th>City</th><th>Metro</th><th>Licensed</th></tr>
+      <caption>TABC license records — selected sample</caption>
+      <tr><th scope="col">Venue</th><th scope="col">Type</th><th scope="col">Status</th><th scope="col">City</th><th scope="col">Metro</th><th scope="col">Licensed</th></tr>
       <!-- SAMPLE:START -->
       <tr><td>Creole's Restaurant & Lounge</td><td><span class="tag r">Restaurant</span></td><td><span class="tag new">Newly Licensed</span></td><td>Houston</td><td>Houston</td><td>Jul 31</td></tr>
       <tr><td>Town Square Socialhouse</td><td><span class="tag b">Bar / Club</span></td><td><span class="tag new">Newly Licensed</span></td><td>Houston</td><td>Houston</td><td>Jul 31</td></tr>
@@ -113,8 +141,9 @@ footer a{color:var(--sub)}
       <tr><td>Katz's</td><td><span class="tag r">Restaurant</span></td><td><span class="tag new">Newly Licensed</span></td><td>Austin</td><td>Austin</td><td>Jul 30</td></tr>
       <!-- SAMPLE:END -->
     </table>
+    </div>
 
-    <p class="subnote" style="text-align:center">Feeds also include <strong>pending applications</strong> — venues that filed but aren't licensed yet, often 1–3 months before opening.</p>
+    <p class="subnote" style="text-align:center">Weekly feeds also include <strong>pending applications</strong>. An application is a prospecting signal, not a guarantee that a venue will open.</p>
   </div>
 </section>
 
@@ -131,7 +160,7 @@ footer a{color:var(--sub)}
           <li>1 metro territory</li>
           <li>Weekly CSV + summary</li>
           <li>Pending + newly licensed venues</li>
-          <li>Email delivery every Monday</li>
+          <li>Email delivery scheduled for Mondays</li>
         </ul>
         <a class="cta" href="https://buy.stripe.com/dRm14p3Ci12Fe2B5EC4ko03">Claim Founding Spot</a>
       </div>
@@ -144,7 +173,7 @@ footer a{color:var(--sub)}
           <li>1 metro territory (Houston, DFW, Austin, or San Antonio)</li>
           <li>Weekly CSV + summary</li>
           <li>Pending + newly licensed venues</li>
-          <li>Stage-change alerts (application → licensed)</li>
+          <li>Stage changes in the weekly feed (application → licensed)</li>
         </ul>
         <a class="cta" href="https://buy.stripe.com/aFa00l5Kq12F4s15EC4ko02">Subscribe</a>
       </div>
@@ -168,20 +197,21 @@ footer a{color:var(--sub)}
   <div class="wrap faq">
     <h2>FAQ</h2>
     <h3>Where does the data come from?</h3>
-    <p>Public government records: Texas Alcoholic Beverage Commission license applications and issuances, plus related public filings. We aggregate, deduplicate, classify, and track them — the underlying records are public; the intelligence layer is ours.</p>
+    <p>Texas Alcoholic Beverage Commission liquor-license applications and issuances. We aggregate, deduplicate, classify, and track these public records. This source does not cover every restaurant or establish a separate business-filings feed.</p>
     <h3>Who is this for?</h3>
     <p>Anyone who sells to new restaurants and bars: food and beverage distributors, POS and payments resellers, kitchen equipment dealers, payroll and insurance reps, marketing agencies, and suppliers of all kinds.</p>
     <h3>How fresh is it?</h3>
-    <p>Our pipeline checks state records every morning. Weekly feeds arrive Monday mornings with everything from the prior week — including venues that filed applications but aren't licensed yet, often months before opening day.</p>
+    <p>Subscriptions provide weekly feeds, with Monday delivery scheduled. The public sample has its own refresh status and provenance, shown above. Record dates do not establish when the feed was updated. Request an available sample to assess it.</p>
     <h3>What format do I get?</h3>
     <p>A clean CSV (name, category, stage, address, city, county, dates) plus a readable summary. Drops straight into any CRM or spreadsheet.</p>
     <h3>Can I cancel anytime?</h3>
     <p>Yes — subscriptions are month-to-month with self-serve cancellation. No contracts, no calls.</p>
     <h3>Do you cover states besides Texas?</h3>
-    <p>Texas today; Florida and California are next. Founding members get first access to new territories at their locked rate.</p>
+    <p>The current offering covers Texas, with Houston, Dallas–Fort Worth, Austin, and San Antonio metro plans. Multi-Territory includes a statewide summary.</p>
   </div>
 </section>
 
+</main>
 <footer>
   <div class="wrap">
     <div>© 2026 OpeningWire · 16998 Middlebelt Rd, Unit #5032, Livonia, MI 48154</div>
@@ -191,6 +221,7 @@ footer a{color:var(--sub)}
       <a href="mailto:support@openingwire.com">support@openingwire.com</a>
     </div>
   </div>
+  <p class="metro-links">Metro links lead to TABC license samples; venue opening dates are unverified.</p>
   <!-- METRO-LINKS:START -->
   <p class="metro-links">New openings by metro: <a href="/new-restaurants-houston/">Houston</a> · <a href="/new-restaurants-dallas/">Dallas–Fort Worth</a> · <a href="/new-restaurants-austin/">Austin</a> · <a href="/new-restaurants-san-antonio/">San Antonio</a></p>
   <!-- METRO-LINKS:END -->
