@@ -1,11 +1,14 @@
 # Static truth and freshness validation
 
 Validated October 17, 2026 against baseline
-`f97528e7fd3350782da46bc85450c10a7623ce59`. Local static checks and browser QA
-passed. This verifies the frontend and compatibility with the existing producer;
+`f97528e7fd3350782da46bc85450c10a7623ce59`. The original static and browser checks below
+record the frontend baseline; the paired integration follow-up is recorded at
+the end of this document. Console exceptions are disclosed below. This verifies
+frontend source behavior and compatibility with the reviewed producer;
 it does not establish a successful source refresh, subscriber delivery, or live
-deployment. The [producer contract](sample-generation-contract.md) remains a
-proposal requiring producer-owner agreement.
+deployment. The [producer contract](sample-generation-contract.md) now specifies the paired
+implementation in scraper PR #35 and site PR #3; live publication remains an
+owner operation.
 
 ## Changed-page inventory
 
@@ -57,7 +60,9 @@ framework, project dependency, build step, or browser package was added. The
 baseline was served from a separate `git archive` copy at `127.0.0.1:4174`, the
 edited checkout at `127.0.0.1:4173`, and synthetic fixtures at `127.0.0.1:4175`.
 
-- All eight pages loaded with HTTP 200 and no console errors.
+- All eight page requests loaded with HTTP 200. The retained homepage desktop
+  console record contains a resource 404; its URL is not identified in the saved
+  evidence, so a console-clean run and the resource identity are not established.
 - All **24 page/width combinations** at 1280, 390, and 320px had document width
   equal to viewport width after the change. The table alone scrolls horizontally.
 - Full-page desktop/mobile captures of all eight pages were visually reviewed.
@@ -72,8 +77,9 @@ edited checkout at `127.0.0.1:4173`, and synthetic fixtures at `127.0.0.1:4175`.
   region, and a description explaining horizontal scrolling and record dates.
 - Four temporary states at all three widths passed **12 additional layout
   checks**: available/fresh at render, stale at render, missing provenance, and
-  the production unknown fallback. All were free of page overflow and console
-  errors. A synthetic long venue name wrapped within the table; `Oct 11, 2026`
+  the production unknown fallback. All were free of page overflow. The retained
+  fresh-fixture console record contains an unidentified resource 404; the saved
+  evidence does not establish that this was a favicon or any specific asset. A synthetic long venue name wrapped within the table; `Oct 11, 2026`
   remained readable and its column was reachable at the right scroll edge.
   Proposed known states display explicit UTC ingest/render/expected dates and
   explain that status does not update between publications. This checks their
@@ -148,8 +154,9 @@ real `inject()`, `update_page()`, and `update_b2b_page()` functions with a synth
 row. It preserved every byte outside `SAMPLE`, retained the fallback and markers,
 and returned unchanged on the second injection. `update_footer_links()` also
 returned unchanged. Original site/producer files and the producer database were
-untouched. These tests establish compatibility with the existing updater; the
-future freshness writer still needs its own producer implementation and tests.
+untouched. These historical tests establish compatibility with that baseline
+updater. The actual new freshness writer is covered by the paired integration
+follow-up below.
 
 ## Rendered evidence
 
@@ -171,11 +178,33 @@ and [synthetic status/layout fixtures](qa-evidence/synthetic-freshness-states.jp
 
 ## Remaining owner actions
 
-The producer owner must agree the proposed interface through its existing
-OpenSpec lifecycle, implement generated year-bearing dates and neutral teasers,
-and atomically publish rows and proven freshness metadata through its reviewed
-path. An authorized operator must separately resolve the documented publishing
+The paired interface is now implemented through the producer's OpenSpec
+follow-up and must be reviewed in both PRs before the next authorized refresh.
+Only the producer writes year-bearing sample rows and matching metadata through
+its existing publication path. An authorized operator must separately resolve the documented publishing
 credential failure and verify a genuine publication/deployment. No workflow was
 dispatched, no report generated, no provider queried, and no merge or deployment
 performed for this validation. The production page therefore keeps its explicit
 unknown-refresh fallback.
+
+## Paired integration QA follow-up — October 17, 2026
+
+The original literal fixtures above did not test producer PR #35. Real paired
+rendering revealed a second, contradictory unknown-refresh card after valid
+source evidence was emitted. All eight pages now mark the existing card with
+SAMPLE-FRESHNESS boundaries. The paired producer replaces that region, instead
+of adding a second freshness row. Existing production SAMPLE and footer bytes,
+checkout destinations, current fallback text and static shell remain preserved.
+
+`check_producer_integration.py` runs the actual reviewed producer with synthetic
+in-memory data against temporary copies of all eight current pages. It checks
+fresh, stale, missing and future-invalid evidence, one coherent accessible card,
+source/generation/publication semantics, row counts/hashes, escaped venue text,
+all non-owned bytes, idempotence, and rejection before writes for malformed
+markers. Socket connections are denied. It does not inspect production data or
+publish its fixtures. The static-only checker still separately protects existing
+generated bytes; literal layout fixtures are not a substitute for this test.
+
+No new visual, mobile-width, contrast or console-clean pass is claimed for this
+follow-up. Prior screenshots remain evidence of their original revision, and
+the two saved resource 404 observations have not been reclassified or erased.

@@ -1,46 +1,149 @@
-# Sample publication contract proposal
+# Sample generation contract — paired integration
 
-Status: **proposed, not agreed or implemented by the producer**. Audited October
-17, 2026. The frontend change supplies truthful static copy and an unknown-refresh
-fallback; it does not publish new samples or establish successful delivery.
+This contract is implemented together by scraper-business PR #35 and
+openingwire-site PR #3, including the QA follow-up change
+`align-site-freshness-regions`. The paired implementation starts from producer
+`65f0694ffcb64f3327d820b7e6602aa1bd2ea4f6` and consumer
+`e3e7fc3360ddf5032146884619984af3c84de9f2`. It supersedes the earlier unagreed
+`source_ingested_at` / `rendered_at` / `stale_after` proposal. Source changes and
+local test success do not establish production recovery or deployment.
 
-## Owners and coordination
+## Owners and concrete region agreement
 
-`Clear-Mind-Systems/scraper-business` owns report generation, sample selection,
-generated rows and freshness metadata, and the publication workflow. This site
-owns static copy, styles, table labels, accessibility, and explanatory text
-outside generated regions. There is one writer for each generated region.
+`Clear-Mind-Systems/scraper-business` is the single writer of SAMPLE interiors,
+SAMPLE-FRESHNESS interiors, `data/sample-metadata.json`, and the publication
+workflow. The site owns the surrounding static copy, layout, accessible table
+wrappers, styles, navigation, legal pages, sitemap, pricing and checkout links.
+No site script fetches data or updates production samples.
 
-No freshness/publication OpenSpec proposal or open producer PR was available at
-audit time. All remote branches were checked. The active producer change was
-`enroll-remote-development-toolkit`; it does not define this interface. The
-producer owner must adopt or revise this artifact diff in its existing OpenSpec
-lifecycle, with deltas to `site-sample-refresh`, `seo-metro-pages`, and
-`b2b-seo-pages`. Record the accepted producer change/PR and exact artifact diff
-here before integrating genuine output. This document is a handoff attached to
-the frontend PR, not an assertion of agreement or a competing update process.
+The same two disjoint marker pairs apply to all eight paths in the provenance
+table below. The freshness region must precede the table; SAMPLE remains inside
+it. All eight pages retain their current fallback text and existing SAMPLE bytes
+when the marker boundaries are first installed:
 
-## Audited implementation
+```diff
++<!-- SAMPLE-FRESHNESS:START -->
+ <div class="sample-freshness" id="sample-freshness" aria-labelledby="sample-status-title">
+   ...existing unknown-refresh explanation and explicitly historical archive reference...
+ </div>
++<!-- SAMPLE-FRESHNESS:END -->
+```
 
-Producer main was
-[`8e2be732ee93478978782d451771e6ab35a580bc`](https://github.com/Clear-Mind-Systems/scraper-business/tree/8e2be732ee93478978782d451771e6ab35a580bc).
-Site main was
-[`f97528e7fd3350782da46bc85450c10a7623ce59`](https://github.com/Clear-Mind-Systems/openingwire-site/tree/f97528e7fd3350782da46bc85450c10a7623ce59).
+On a later authorized refresh, the real producer replaces the entire card with
+one of the forms below and replaces SAMPLE rows in the same prepared page
+string. It does not also append a table freshness row. Every marker pair must be
+unique and ordered, disjoint from the other region, and outside/inside the table
+as specified. All eight pages are validated before any write. An unmarked
+freshness card, mixed old/new page modes, or malformed pair fails before writes.
+Legacy pages with no freshness card and no SAMPLE-FRESHNESS markers retain the
+producer's original final-row interface; they cannot carry a conflicting card.
 
-| Evidence at producer SHA | Actual behavior |
+Every page output is prepared before the existing per-file write pass. The JSON
+sidecar is written last. This is not a filesystem transaction across pages: a
+write error must stop publication, and the owner reviews the complete successful
+output before publishing. The site adds no second writer or deployment path.
+
+## Fields and clocks
+
+The implementation uses the producer's version-1 JSON contract, unchanged:
+
+| Field | Meaning |
 | --- | --- |
-| [`config.yaml:9`](https://github.com/Clear-Mind-Systems/scraper-business/blob/8e2be732ee93478978782d451771e6ab35a580bc/config.yaml#L9) | Sources are TABC pending applications (`mxm5-tdpj`) and issued retail licenses (`7hf9-qc9f`); there is no separate business-filings feed. |
-| [`pipeline/site_sample.py:49`](https://github.com/Clear-Mind-Systems/scraper-business/blob/8e2be732ee93478978782d451771e6ab35a580bc/pipeline/site_sample.py#L49) | `fmt_licensed()` removes the year; missing/invalid dates render empty. Selection orders by `COALESCE(stage_changed_at, first_seen)`, without a current-week cutoff. |
-| [`pipeline/site_sample.py:118`](https://github.com/Clear-Mind-Systems/scraper-business/blob/8e2be732ee93478978782d451771e6ab35a580bc/pipeline/site_sample.py#L118) | `inject(path, rows)` replaces only the first `SAMPLE` marker region and preserves all surrounding bytes. Missing markers fail. No freshness metadata is emitted. |
-| [`pipeline/seo_pages.py:438`](https://github.com/Clear-Mind-Systems/scraper-business/blob/8e2be732ee93478978782d451771e6ab35a580bc/pipeline/seo_pages.py#L438) | Generated teasers make unsupported current-week/universal-coverage claims; pending zero-count text also promises same-day delivery. They are producer-owned and covered by producer tests. |
-| [`pipeline/seo_pages.py:642`](https://github.com/Clear-Mind-Systems/scraper-business/blob/8e2be732ee93478978782d451771e6ab35a580bc/pipeline/seo_pages.py#L642) | With `<!-- seo-pages:v1 -->` present, existing landing pages receive marker-only updates. A missing/different version triggers a full shell rewrite. |
-| [`pipeline/seo_pages.py:684`](https://github.com/Clear-Mind-Systems/scraper-business/blob/8e2be732ee93478978782d451771e6ab35a580bc/pipeline/seo_pages.py#L684) | Homepage `METRO-LINKS` and `B2B-LINKS` blocks are also producer-owned; `update_footer_links()` regenerates their labels and links independently of the page version. |
-| [`pipeline/seo_pages.py:729`](https://github.com/Clear-Mind-Systems/scraper-business/blob/8e2be732ee93478978782d451771e6ab35a580bc/pipeline/seo_pages.py#L729) | Sitemap regeneration depends on URL-set changes. Its `lastmod` is not sample-ingestion evidence. |
-| [`weekly-report.yml:68`](https://github.com/Clear-Mind-Systems/scraper-business/blob/8e2be732ee93478978782d451771e6ab35a580bc/.github/workflows/weekly-report.yml#L68) | Checkout, homepage injection, and SEO generation are separate steps. Scheduled jobs push site changes; manual jobs open/update a PR. The schedule is Monday 13:00 UTC. |
+| `contract_version` | `1`. Unsupported versions do not establish provenance. |
+| `source_ingest_succeeded_at` | Latest recorded successful ingest completion, UTC ISO8601 with `Z`, or null. Not a venue opening, current clock, file time, watermark or git commit time. |
+| `generated_at` | Actual rendering time for this payload/provenance version; retained for identical output. Must follow valid source success. |
+| `published_at` | Null; HTML always says publication unverified. A push or HTTP 200 is not exact-artifact publication evidence. |
+| `source_freshness` | `fresh`, `stale`, `missing`, or `invalid`, evaluated at generation. Missing/invalid show unknown. |
+| `freshness_thresholds_hours` | Source ingest 48 hours; generated artifact 192 hours. Exactly 48 source hours is fresh. |
+| `pages[path]` | `kind`, real venue `row_count`, and `rows_sha256` of UTF-8 venue/teaser rows with LF separators and no final LF. Excludes freshness and marker indentation. |
 
-The site's older architecture description of a `PAGE_PROFILES` injector and
-per-refresh sitemap dates does not match current producer code. Historical
-implementation is not proof of current behavior.
+Known states show absolute UTC ingest and generation timestamps including years.
+These are static observations evaluated at generation, not a live age timer.
+The card explicitly says it does not update between publications. A newer failed
+ingest does not advance source success; missing/malformed evidence stays unknown;
+a stale ingest remains stale even when the render succeeds. No recent records or
+source timestamps are fabricated. Empty selections may still have known ingest
+provenance. Row dates are source issue/application dates and include the year.
+
+A missing JSON sidecar does not get reconstructed by this static site from file
+or commit dates. The next producer refresh rebuilds actual provenance; operators
+use the producer's read-only freshness checker for current health. Readers see
+only the rendered observation and absolute dates, never a claim of live health.
+
+## Representative rendered HTML — synthetic fixtures only
+
+The following are emitted by the actual producer renderer for labelled local
+test inputs. They are not production timestamps or publishable venue samples.
+The static checker can write layout fixtures outside the checkout. The separate
+paired checker calls the actual producer with an in-memory database and asserts
+one coherent card across all eight real pages for each source state.
+
+Fresh:
+
+```html
+    <div class="sample-freshness" id="sample-freshness" aria-labelledby="sample-status-title" data-source-freshness="fresh">
+      <h3 id="sample-status-title">Sample source ingest recorded</h3>
+      <p>Source ingest within 48 hours at generation. Source ingest: <time datetime="2026-10-17T19:00:00Z">2026-10-17 19:00:00 UTC</time>. Sample generated: <time datetime="2026-10-17T20:00:00Z">2026-10-17 20:00:00 UTC</time>. Publication: unverified.</p>
+      <p>This status is evaluated at generation and does not update between publications. Source ingest is not a venue opening date. Request a current sample if these dates are too old for your needs.</p>
+      <p><a href="mailto:founders@openingwire.com?subject=OpeningWire%20sample%20request&amp;body=Please%20send%20an%20available%20sample%20for%20my%20metro%3A%20">Request an available sample for your metro</a>.</p>
+    </div>
+```
+
+Stale:
+
+```html
+    <div class="sample-freshness" id="sample-freshness" aria-labelledby="sample-status-title" data-source-freshness="stale">
+      <h3 id="sample-status-title">Sample source data stale</h3>
+      <p>Source data stale: successful ingest older than 48 hours at generation. Source ingest: <time datetime="2026-10-04T13:27:46Z">2026-10-04 13:27:46 UTC</time>. Sample generated: <time datetime="2026-10-17T20:00:00Z">2026-10-17 20:00:00 UTC</time>. Publication: unverified.</p>
+      <p>This status is evaluated at generation and does not update between publications. Source ingest is not a venue opening date. Request a current sample if these dates are too old for your needs.</p>
+      <p><a href="mailto:founders@openingwire.com?subject=OpeningWire%20sample%20request&amp;body=Please%20send%20an%20available%20sample%20for%20my%20metro%3A%20">Request an available sample for your metro</a>.</p>
+    </div>
+```
+
+Missing:
+
+```html
+    <div class="sample-freshness" id="sample-freshness" aria-labelledby="sample-status-title" data-source-freshness="missing">
+      <h3 id="sample-status-title">Sample refresh time unknown</h3>
+      <p>Source freshness unknown: no valid successful ingest timestamp. Source ingest: unknown. Sample generated: <time datetime="2026-10-17T20:00:00Z">2026-10-17 20:00:00 UTC</time>. Publication: unverified.</p>
+      <p>This status is evaluated at generation and does not update between publications. Source ingest is not a venue opening date. Request a current sample if these dates are too old for your needs.</p>
+      <p><a href="mailto:founders@openingwire.com?subject=OpeningWire%20sample%20request&amp;body=Please%20send%20an%20available%20sample%20for%20my%20metro%3A%20">Request an available sample for your metro</a>.</p>
+    </div>
+```
+
+Synthetic long-name row for layout testing only:
+
+```html
+<tr><td>SYNTHETIC Cafe with a deliberately long display name for layout testing</td><td>Restaurant</td><td>Newly Licensed</td><td>Austin</td><td>Austin</td><td>Oct 16, 2026</td></tr>
+```
+
+## Verification and publication dependency
+
+Run static-only protection against the reviewed frontend baseline separately
+from actual producer integration:
+
+```bash
+python3 scripts/check_site.py
+python3 scripts/check_site.py --write-fixtures /tmp/openingwire-layout-fixtures
+../scraper-business/.venv/bin/python scripts/check_producer_integration.py --producer-root ../scraper-business
+```
+
+The paired command blocks sockets and writes only temporary copies, uses no
+production database, tests fresh/stale/missing/future-invalid evidence and marker
+failure behavior, verifies row hashes and counts, and checks byte-stable reruns
+and preservation of all non-owned bytes. Static SAMPLE equality remains required
+for frontend-only changes; it is deliberately not imposed on generated output.
+After a producer publication, pass its reviewed commit with `--baseline`; the
+static checker accepts known producer states and verifies their UTC fields
+against the sidecar instead of demanding the old unknown fallback.
+The test requires the reviewed producer checkout and its existing test dependencies;
+there is no implicit download, provider call or live refresh.
+
+Review/coordinate both PRs before the next authorized production refresh. The
+existing runner and SITE_PUSH_TOKEN recovery actions remain owner work. No
+merge, dispatch, deployment, credential operation or SMTP send follows from
+passing these tests. Production publication must verify the matching deployed
+version and all reviewed rows and provenance separately.
 
 ## Baseline date provenance
 
@@ -71,176 +174,3 @@ that commit time nor these record dates establish an ingestion timestamp.
 Baseline labels must remain explicitly tied to this archived snapshot; they
 must not describe rows supplied by a later publisher as though independently
 verified by this frontend change.
-
-## Proposed artifact diff
-
-Apply the same contract to the eight paths above. Retain exactly one existing
-`<!-- SAMPLE:START -->` / `<!-- SAMPLE:END -->` pair per page and retain
-`<!-- seo-pages:v1 -->` on the seven landing pages. Keep the six table columns.
-Do not put status blocks inside `<table>` or nest marker regions.
-
-The current frontend fallback is an ordinary static `div.sample-freshness` with
-`id="sample-freshness"`, labelled by `sample-status-title`. Only after agreement,
-the producer integration adds the following distinct region around/replacing
-that block, before the table. It then owns all bytes inside the new markers:
-
-```diff
-+<!-- SAMPLE-FRESHNESS:START -->
- <div class="sample-freshness" id="sample-freshness" aria-labelledby="sample-status-title">
--  ...static unknown-refresh fallback and explicitly archived provenance...
-+  ...producer-rendered status, dates, and provenance for these exact rows...
- </div>
-+<!-- SAMPLE-FRESHNESS:END -->
-```
-
-The frontend does **not** install those proposed markers or generated values in
-this PR. Old `inject()` remains compatible because its exact `SAMPLE` tokens
-do not match `SAMPLE-FRESHNESS` tokens. The producer must add a separate strict
-injector, validating one ordered pair of each marker before writing anything.
-Prepare both row and metadata replacements in memory, validate them, and write
-the page atomically. Never publish new metadata with old rows after a failure.
-
-The producer's reviewed artifact diff must also:
-
-- Render record dates with a year and machine-readable `<time datetime="YYYY-MM-DD">`;
-  use explicit "Date unavailable" for missing/invalid record dates. Issued pages
-  use TABC original issue dates; the tracker uses application submission dates.
-- Replace unsupported generated teasers with neutral text scoped to the
-  classified TABC restaurant/bar feed, and remove undated "this week" counts.
-  Until then, frontend CSS suppresses `.seo-teaser` and a static explanatory
-  label supplies the truthful coverage limit; generated bytes remain intact.
-- Update producer-owned footer labels where needed, including "New openings by
-  metro" to "License leads by metro". Preserve both existing `METRO-LINKS` and
-  `B2B-LINKS` marker pairs and their bytes in this frontend-only change.
-- Preserve frontend copy, table wrappers, focus styles, canonical URLs,
-  structured data, checkout links, and fallback/sample-request accessibility.
-  A template-version bump requires reviewed synchronization of these shells;
-  it must not reintroduce the old marketing claims.
-- Keep freshness rendering inside the existing producer publication path.
-  Timestamp semantics do not authorize a workflow dispatch, deployment, or
-  a second writer in this site repository.
-
-## Timestamp and state semantics to agree
-
-All instant values use RFC 3339 UTC with `Z`, including seconds. Human-readable
-values include the year and "UTC". Date-only record values retain source calendar
-dates; do not pretend they are UTC midnight events or venue-opening dates.
-
-| Field | Meaning and rule |
-| --- | --- |
-| `source_ingested_at` | Verified completed successful ingest represented by the artifact's database snapshot. The producer must document the evidence linking that ingest to these rows. A commit timestamp, watermark, latest license date, or current clock is not a substitute. If not provable, omit and render unknown. |
-| `rendered_at` | When this artifact was rendered, also the instant at which its status was evaluated. It is not ingestion, publication, subscriber delivery, or a venue opening. |
-| `record_date_start` / `record_date_end` | Min/max valid issue dates for issued rows, or submission dates for pending rows actually included in this artifact. Unknown dates are disclosed separately. |
-| `stale_after` | Explicit UTC boundary for the next expected snapshot under the agreed policy. Proposed policy: eight days after the verified source ingest (weekly cadence plus one day); producer owner must confirm or replace it. |
-| `state` | `available`, `stale`, or `missing`, evaluated at `rendered_at`; meaning is described below. |
-
-`available` means all required provenance is valid and `rendered_at` is before
-`stale_after`. The UI says "Sample snapshot available", never "Live now".
-`stale` means valid provenance exists but the artifact was already past that
-boundary when rendered. `missing` means refresh provenance is absent,
-malformed, inconsistent, or in the future; show "Sample refresh time unknown".
-An empty qualified selection is explicitly "No sample records available" and
-does not justify inventing records or dates; it can still have known ingest
-provenance. Partial/missing record dates do not themselves establish refresh
-provenance.
-
-No client script or timer is added. These state labels are frozen at rendering;
-an `available` artifact does not automatically become `stale` when the publisher
-stops. Every known state therefore shows its absolute dates, the evaluated-as-of
-time, and "This status does not update between publications. If the expected
-update has passed, request a current sample." No elapsed-age badge is promised.
-
-## Representative rendered HTML — fixtures only
-
-The following invented timestamps are test examples, never production content.
-All three replace only the fallback block in temporary copies for visual QA.
-The production unknown fallback continues to show actual archived provenance.
-
-Available (the fresh-at-render scenario):
-
-```html
-<div class="sample-freshness" id="sample-freshness" aria-labelledby="sample-status-title" data-sample-state="available">
-  <h3 id="sample-status-title">Sample snapshot available</h3>
-  <p>Source data ingested <time datetime="2026-10-12T11:32:00Z">October 12, 2026 at 11:32 UTC</time>. Snapshot rendered and status checked <time datetime="2026-10-12T13:00:00Z">October 12, 2026 at 13:00 UTC</time>.</p>
-  <p>License dates: October 5–11, 2026. These are license dates, not opening dates. Expected update by <time datetime="2026-10-20T11:32:00Z">October 20, 2026 at 11:32 UTC</time>.</p>
-  <p>This status does not update between publications. If the expected update has passed, <a href="mailto:founders@openingwire.com?subject=OpeningWire%20sample%20request&amp;body=Please%20send%20an%20available%20sample%20for%20my%20metro%3A%20">request a current sample</a>.</p>
-</div>
-```
-
-Stale at render:
-
-```html
-<div class="sample-freshness" id="sample-freshness" aria-labelledby="sample-status-title" data-sample-state="stale">
-  <h3 id="sample-status-title">Sample update overdue when checked</h3>
-  <p>Source data ingested <time datetime="2026-10-01T11:32:00Z">October 1, 2026 at 11:32 UTC</time>. Expected update by <time datetime="2026-10-09T11:32:00Z">October 9, 2026 at 11:32 UTC</time>.</p>
-  <p>Status checked when rendered <time datetime="2026-10-12T13:00:00Z">October 12, 2026 at 13:00 UTC</time>. License dates: September 25–30, 2026; these are not opening dates.</p>
-  <p>These historical records do not confirm current availability. This status does not update between publications. <a href="mailto:founders@openingwire.com?subject=OpeningWire%20sample%20request&amp;body=Please%20send%20an%20available%20sample%20for%20my%20metro%3A%20">Request a current sample</a>.</p>
-</div>
-```
-
-Missing/unknown refresh provenance:
-
-```html
-<div class="sample-freshness" id="sample-freshness" aria-labelledby="sample-status-title" data-sample-state="missing">
-  <h3 id="sample-status-title">Sample refresh time unknown</h3>
-  <p>No verified source-ingestion or sample-update timestamp is available. License/application dates describe records, not when this feed was updated or a venue opened.</p>
-  <p>Treat this as a historical example, not a current-week feed. <a href="mailto:founders@openingwire.com?subject=OpeningWire%20sample%20request&amp;body=Please%20send%20an%20available%20sample%20for%20my%20metro%3A%20">Request a current sample</a>.</p>
-</div>
-```
-
-Long-name/year fixture row (temporary table only):
-
-```html
-<tr><td>Example Restaurant With A Very Long Venue Name For Layout Testing</td><td><span class="tag r">Restaurant</span></td><td><span class="tag new">Newly Licensed</span></td><td>San Antonio</td><td>San Antonio</td><td><time datetime="2026-10-11">Oct 11, 2026</time></td></tr>
-```
-
-## Integration checks and owner actions
-
-The existing producer tests are
-[`tests/test_site_sample.py`](https://github.com/Clear-Mind-Systems/scraper-business/blob/8e2be732ee93478978782d451771e6ab35a580bc/tests/test_site_sample.py)
-and
-[`tests/test_seo_pages.py`](https://github.com/Clear-Mind-Systems/scraper-business/blob/8e2be732ee93478978782d451771e6ab35a580bc/tests/test_seo_pages.py).
-They cover marker preservation, outside-region hand edits, template-version
-rewrites, date formatting, teaser wording, deterministic JSON-LD, and no-change
-idempotency. They currently assert yearless dates and legacy teaser claims;
-they do not implement or test the proposed freshness region. `tests/conftest.py`
-uses in-memory databases, redirects production database paths, and clears LLM
-keys. Run only fixture-based tests, never producer entry points against the
-shared site checkout or committed database.
-
-Validation on October 17, 2026: **125 tests passed** from those two unchanged
-producer test files, using an isolated scratch virtual environment and blocked
-socket connections. A separate HTML-only compatibility check copied all eight
-modified frontend pages to a temporary directory, blocked database and network
-connections, and exercised the actual `inject()`, `update_page()`, and
-`update_b2b_page()` functions with a synthetic row. All eight preserved every
-byte outside `SAMPLE`, retained the fallback card, and returned unchanged on
-the second injection. `update_footer_links()` also returned unchanged. The
-shared frontend and producer files were not written by those checks. These
-results validate compatibility with the existing updater, not future metadata
-support.
-
-Producer acceptance must add focused tests for all three freshness states,
-invalid/future timestamps, missing and empty records, year-bearing dates,
-escaped long names, ordered unique marker pairs, atomic row/metadata writes,
-idempotency, and preservation of the frontend's exact surrounding HTML. Confirm
-the clock/cutoff policy in its OpenSpec design. Existing template tests remain
-the integration starting point; frontend temporary renders cannot prove producer
-support for the proposed metadata.
-
-Publication remains blocked independently of this frontend work.
-[Issue 27](https://github.com/Clear-Mind-Systems/scraper-business/issues/27) is
-open. The
-[September 28 run](https://github.com/Clear-Mind-Systems/scraper-business/actions/runs/36475714914/job/109108784072)
-shows reports, sample CSVs, digest generation, and their commit succeeding;
-"Checkout site repo" failed, and both site render steps were skipped. The audit
-input identifies "Bad credentials"; job-step status was independently confirmed
-but log download access was unavailable in this session. Do not describe that
-run as a site refresh or as a complete report-generation failure.
-
-The producer owner must resolve publication authentication through its authorized
-operations path, review and implement the agreed contract, supply genuine
-generated artifacts in its own reviewed change, and verify their deployed
-result when separately authorized. This task changes no credentials, dispatches
-no workflow, merges nothing, and does not deploy. Until then, unknown refresh
-recency remains visible and no frontend fixture is promoted to production data.

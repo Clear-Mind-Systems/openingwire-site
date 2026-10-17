@@ -20,6 +20,7 @@ import xml.etree.ElementTree as ET
 BASELINE = "f97528e7fd3350782da46bc85450c10a7623ce59"
 ORIGIN = "https://openingwire.com"
 START, END = "<!-- SAMPLE:START -->", "<!-- SAMPLE:END -->"
+FRESH_START, FRESH_END = "<!-- SAMPLE-FRESHNESS:START -->", "<!-- SAMPLE-FRESHNESS:END -->"
 VOID = set("area base br col embed hr img input link meta param source track wbr".split())
 
 
@@ -186,6 +187,14 @@ def check_site(root, baseline):
             require(sample(source) == sample(old), prefix + "generated SAMPLE bytes changed")
         except ValueError as exc:
             errors.append(prefix + str(exc))
+        require(source.count(FRESH_START) == source.count(FRESH_END) == 1,
+                prefix + "requires exactly one SAMPLE-FRESHNESS pair")
+        if source.count(FRESH_START) == source.count(FRESH_END) == 1:
+            start, end = source.index(FRESH_START), source.index(FRESH_END)
+            require(start < end < source.find("<table"), prefix + "freshness region must precede table")
+            region = Document(source[start:end])
+            require("sample-freshness" in region.ids and "sample-status-title" in region.ids,
+                    prefix + "freshness markers must contain the complete labelled fallback")
         require(source.count("<!-- seo-pages:v1 -->") == old.count("<!-- seo-pages:v1 -->"), prefix + "changed seo-pages:v1 marker")
         for block in ("METRO-LINKS", "B2B-LINKS"):
             for boundary in ("START", "END"):
@@ -200,8 +209,30 @@ def check_site(root, baseline):
         status = doc.ids.get("sample-freshness")
         require(status is not None and status.tag == "div" and status.has_class("sample-freshness") and status.attrs.get("aria-labelledby") == "sample-status-title", prefix + "missing labelled freshness explanation")
         if status:
-            require("unknown" in status.text().lower() and "unavailable" in status.text().lower(), prefix + "source-refresh fallback must explicitly say unknown/unavailable")
-            require(bool(re.search(r"\b20\d{2}\b", status.text())), prefix + "archive provenance lacks a year")
+            state = status.attrs.get("data-source-freshness")
+            if state is None:
+                require("unknown" in status.text().lower() and "unavailable" in status.text().lower(), prefix + "source-refresh fallback must explicitly say unknown/unavailable")
+                require(bool(re.search(r"\b20\d{2}\b", status.text())), prefix + "archive provenance lacks a year")
+            else:
+                require(state in {"fresh", "stale", "missing", "invalid"}, prefix + "unsupported producer freshness state")
+                require("does not update between publications" in status.text(), prefix + "generated status must disclose its static clock")
+                require("Publication: unverified" in status.text(), prefix + "generation must not claim publication")
+                require("Archive reference:" not in status.text(), prefix + "generated provenance retains historical fallback")
+                if state in {"fresh", "stale"}:
+                    require("unknown" not in status.text().lower() and "unavailable" not in status.text().lower(), prefix + "known source contradicts unknown fallback")
+                else:
+                    require("Source freshness unknown" in status.text(), prefix + "missing/invalid source must remain unknown")
+                try:
+                    metadata = json.loads((root / "data/sample-metadata.json").read_text())
+                    require(metadata["contract_version"] == 1 and metadata["source_freshness"] == state,
+                            prefix + "rendered freshness differs from producer metadata")
+                    require(metadata["published_at"] is None, prefix + "publication evidence is not supported by this contract")
+                    stamps = [n.attrs.get("datetime") for n in status.nodes() if n.tag == "time"]
+                    expected = [v for v in (metadata["source_ingest_succeeded_at"], metadata["generated_at"]) if v]
+                    require(stamps == expected and all(re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", v) for v in stamps),
+                            prefix + "rendered UTC evidence differs from producer metadata")
+                except (OSError, ValueError, KeyError, TypeError) as exc:
+                    errors.append(prefix + f"missing/invalid producer metadata: {exc}")
             require(any(n.tag == "a" and n.attrs.get("href", "").startswith("mailto:founders@openingwire.com?") for n in status.nodes()), prefix + "freshness explanation needs a sample-request link")
         wrappers = [n for n in doc.nodes if n.has_class("table-scroll")]
         require(len(wrappers) == 1, prefix + "needs one scrollable sample region")
@@ -242,7 +273,10 @@ def check_site(root, baseline):
 
 
 def write_fixtures(root, destination):
-    """Render the proposal's literal examples, never production metadata."""
+    """Render labelled contract examples, never production metadata.
+
+    Actual producer compatibility is tested by check_producer_integration.py.
+    """
     if destination == root or root in destination.parents:
         raise ValueError("fixture destination must be outside the checkout")
     contract = (root / "docs/sample-generation-contract.md").read_text()
@@ -252,10 +286,10 @@ def write_fixtures(root, destination):
         doc = Document(example)
         status = doc.ids.get("sample-freshness")
         if status:
-            states[status.attrs.get("data-sample-state")] = example
+            states[status.attrs.get("data-source-freshness")] = example
         elif any(n.tag == "tr" for n in doc.nodes):
             long_row = example
-    if set(states) != {"available", "stale", "missing"} or not long_row:
+    if set(states) != {"fresh", "stale", "missing"} or not long_row:
         raise ValueError("contract must supply the three metadata examples and long-name/year row")
     homepage = (root / "index.html").read_text()
     pattern = r'<div\b[^>]*\bid="sample-freshness"[^>]*>.*?</div>'
@@ -265,12 +299,12 @@ def write_fixtures(root, destination):
     states["unknown"] = fallback.group()
     destination.mkdir(parents=True, exist_ok=True)
     for state, status in states.items():
-        name = "fresh" if state == "available" else state
+        name = state
         doc = Document(status)
         if "sample-status-title" not in doc.ids:
             raise ValueError(f"{state} fixture lacks its status heading")
         for node in doc.nodes:
-            if node.tag == "time" and state in {"available", "stale"}:
+            if node.tag == "time" and state in {"fresh", "stale"}:
                 if not re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", node.attrs.get("datetime", "")):
                     raise ValueError(f"{state} fixture lacks an explicit UTC timestamp")
             if node.tag == "a":
@@ -288,7 +322,7 @@ def write_fixtures(root, destination):
         if sample(page) != sample(homepage):
             raise ValueError("fixture modified producer-owned sample bytes")
         (destination / f"{name}.html").write_text(page)
-    print(f"PASS: proposal fixtures written outside checkout: {destination}/{{fresh,stale,missing,unknown}}.html")
+    print(f"PASS: labelled contract fixtures outside checkout: {destination}/{{fresh,stale,missing,unknown}}.html")
 
 
 def main():
