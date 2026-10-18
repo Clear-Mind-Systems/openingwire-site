@@ -1,0 +1,411 @@
+{
+  "baseline": "f97528e7fd3350782da46bc85450c10a7623ce59",
+  "driver": "gstack browse headless Chromium",
+  "viewportWidths": [
+    1280,
+    390,
+    320
+  ],
+  "layout": [
+    {
+      "page": "/",
+      "viewport": 1280,
+      "beforeDocumentWidth": 1280,
+      "afterDocumentWidth": 1280,
+      "consoleErrors": "--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: http://127.0.0.1:4173/) ---\n[2026-10-17T19:21:51.158Z] [error] Failed to load resource: the server responded with a status of 404 (File not found)\n--- END UNTRUSTED EXTERNAL CONTENT ---"
+    },
+    {
+      "page": "/",
+      "viewport": 390,
+      "beforeDocumentWidth": 603,
+      "afterDocumentWidth": 390,
+      "consoleErrors": []
+    },
+    {
+      "page": "/",
+      "viewport": 320,
+      "beforeDocumentWidth": 603,
+      "afterDocumentWidth": 320,
+      "consoleErrors": []
+    },
+    {
+      "page": "new-restaurants-austin/",
+      "viewport": 1280,
+      "beforeDocumentWidth": 1280,
+      "afterDocumentWidth": 1280,
+      "consoleErrors": []
+    },
+    {
+      "page": "new-restaurants-austin/",
+      "viewport": 390,
+      "beforeDocumentWidth": 582,
+      "afterDocumentWidth": 390,
+      "consoleErrors": []
+    },
+    {
+      "page": "new-restaurants-austin/",
+      "viewport": 320,
+      "beforeDocumentWidth": 582,
+      "afterDocumentWidth": 320,
+      "consoleErrors": []
+    },
+    {
+      "page": "new-restaurants-dallas/",
+      "viewport": 1280,
+      "beforeDocumentWidth": 1280,
+      "afterDocumentWidth": 1280,
+      "consoleErrors": []
+    },
+    {
+      "page": "new-restaurants-dallas/",
+      "viewport": 390,
+      "beforeDocumentWidth": 570,
+      "afterDocumentWidth": 390,
+      "consoleErrors": []
+    },
+    {
+      "page": "new-restaurants-dallas/",
+      "viewport": 320,
+      "beforeDocumentWidth": 570,
+      "afterDocumentWidth": 320,
+      "consoleErrors": []
+    },
+    {
+      "page": "new-restaurants-houston/",
+      "viewport": 1280,
+      "beforeDocumentWidth": 1280,
+      "afterDocumentWidth": 1280,
+      "consoleErrors": []
+    },
+    {
+      "page": "new-restaurants-houston/",
+      "viewport": 390,
+      "beforeDocumentWidth": 590,
+      "afterDocumentWidth": 390,
+      "consoleErrors": []
+    },
+    {
+      "page": "new-restaurants-houston/",
+      "viewport": 320,
+      "beforeDocumentWidth": 590,
+      "afterDocumentWidth": 320,
+      "consoleErrors": []
+    },
+    {
+      "page": "new-restaurants-san-antonio/",
+      "viewport": 1280,
+      "beforeDocumentWidth": 1280,
+      "afterDocumentWidth": 1280,
+      "consoleErrors": []
+    },
+    {
+      "page": "new-restaurants-san-antonio/",
+      "viewport": 390,
+      "beforeDocumentWidth": 574,
+      "afterDocumentWidth": 390,
+      "consoleErrors": []
+    },
+    {
+      "page": "new-restaurants-san-antonio/",
+      "viewport": 320,
+      "beforeDocumentWidth": 574,
+      "afterDocumentWidth": 320,
+      "consoleErrors": []
+    },
+    {
+      "page": "pre-opening-restaurant-leads-texas/",
+      "viewport": 1280,
+      "beforeDocumentWidth": 1280,
+      "afterDocumentWidth": 1280,
+      "consoleErrors": []
+    },
+    {
+      "page": "pre-opening-restaurant-leads-texas/",
+      "viewport": 390,
+      "beforeDocumentWidth": 579,
+      "afterDocumentWidth": 390,
+      "consoleErrors": []
+    },
+    {
+      "page": "pre-opening-restaurant-leads-texas/",
+      "viewport": 320,
+      "beforeDocumentWidth": 579,
+      "afterDocumentWidth": 320,
+      "consoleErrors": []
+    },
+    {
+      "page": "restaurant-activity-report-alternative/",
+      "viewport": 1280,
+      "beforeDocumentWidth": 1280,
+      "afterDocumentWidth": 1280,
+      "consoleErrors": []
+    },
+    {
+      "page": "restaurant-activity-report-alternative/",
+      "viewport": 390,
+      "beforeDocumentWidth": 579,
+      "afterDocumentWidth": 390,
+      "consoleErrors": []
+    },
+    {
+      "page": "restaurant-activity-report-alternative/",
+      "viewport": 320,
+      "beforeDocumentWidth": 579,
+      "afterDocumentWidth": 320,
+      "consoleErrors": []
+    },
+    {
+      "page": "tabc-license-application-tracker/",
+      "viewport": 1280,
+      "beforeDocumentWidth": 1280,
+      "afterDocumentWidth": 1280,
+      "consoleErrors": []
+    },
+    {
+      "page": "tabc-license-application-tracker/",
+      "viewport": 390,
+      "beforeDocumentWidth": 572,
+      "afterDocumentWidth": 390,
+      "consoleErrors": []
+    },
+    {
+      "page": "tabc-license-application-tracker/",
+      "viewport": 320,
+      "beforeDocumentWidth": 572,
+      "afterDocumentWidth": 320,
+      "consoleErrors": []
+    }
+  ],
+  "keyboard": [
+    {
+      "page": "/",
+      "sampleRequestFocusVisible": true,
+      "tableFocusVisible": true,
+      "outline": "rgb(10, 84, 186) solid 3px",
+      "arrowRightScrollLeft": 42,
+      "pageScrollX": 0
+    },
+    {
+      "page": "new-restaurants-austin/",
+      "sampleRequestFocusVisible": true,
+      "tableFocusVisible": true,
+      "outline": "rgb(10, 84, 186) solid 3px",
+      "arrowRightScrollLeft": 59,
+      "pageScrollX": 0
+    },
+    {
+      "page": "new-restaurants-dallas/",
+      "sampleRequestFocusVisible": true,
+      "tableFocusVisible": true,
+      "outline": "rgb(10, 84, 186) solid 3px",
+      "arrowRightScrollLeft": 40,
+      "pageScrollX": 0
+    },
+    {
+      "page": "new-restaurants-houston/",
+      "sampleRequestFocusVisible": true,
+      "tableFocusVisible": true,
+      "outline": "rgb(10, 84, 186) solid 3px",
+      "arrowRightScrollLeft": 75,
+      "pageScrollX": 0
+    },
+    {
+      "page": "new-restaurants-san-antonio/",
+      "sampleRequestFocusVisible": true,
+      "tableFocusVisible": true,
+      "outline": "rgb(10, 84, 186) solid 3px",
+      "arrowRightScrollLeft": 94,
+      "pageScrollX": 0
+    },
+    {
+      "page": "pre-opening-restaurant-leads-texas/",
+      "sampleRequestFocusVisible": true,
+      "tableFocusVisible": true,
+      "outline": "rgb(10, 84, 186) solid 3px",
+      "arrowRightScrollLeft": 70,
+      "pageScrollX": 0
+    },
+    {
+      "page": "restaurant-activity-report-alternative/",
+      "sampleRequestFocusVisible": true,
+      "tableFocusVisible": true,
+      "outline": "rgb(10, 84, 186) solid 3px",
+      "arrowRightScrollLeft": 42,
+      "pageScrollX": 0
+    },
+    {
+      "page": "tabc-license-application-tracker/",
+      "sampleRequestFocusVisible": true,
+      "tableFocusVisible": true,
+      "outline": "rgb(10, 84, 186) solid 3px",
+      "arrowRightScrollLeft": 109,
+      "pageScrollX": 0
+    }
+  ],
+  "fixtures": [
+    {
+      "fixture": "fresh",
+      "width": 1280,
+      "documentWidth": 1280,
+      "status": "Sample snapshot available",
+      "date": "Oct 11, 2026",
+      "dateColumnReachable": true,
+      "consoleErrors": "--- BEGIN UNTRUSTED EXTERNAL CONTENT (source: http://127.0.0.1:4175/fresh.html) ---\n[2026-10-17T19:25:04.986Z] [error] Failed to load resource: the server responded with a status of 404 (File not found)\n--- END UNTRUSTED EXTERNAL CONTENT ---"
+    },
+    {
+      "fixture": "fresh",
+      "width": 390,
+      "documentWidth": 390,
+      "status": "Sample snapshot available",
+      "date": "Oct 11, 2026",
+      "dateColumnReachable": true,
+      "consoleErrors": []
+    },
+    {
+      "fixture": "fresh",
+      "width": 320,
+      "documentWidth": 320,
+      "status": "Sample snapshot available",
+      "date": "Oct 11, 2026",
+      "dateColumnReachable": true,
+      "consoleErrors": []
+    },
+    {
+      "fixture": "stale",
+      "width": 1280,
+      "documentWidth": 1280,
+      "status": "Sample update overdue when checked",
+      "date": "Oct 11, 2026",
+      "dateColumnReachable": true,
+      "consoleErrors": []
+    },
+    {
+      "fixture": "stale",
+      "width": 390,
+      "documentWidth": 390,
+      "status": "Sample update overdue when checked",
+      "date": "Oct 11, 2026",
+      "dateColumnReachable": true,
+      "consoleErrors": []
+    },
+    {
+      "fixture": "stale",
+      "width": 320,
+      "documentWidth": 320,
+      "status": "Sample update overdue when checked",
+      "date": "Oct 11, 2026",
+      "dateColumnReachable": true,
+      "consoleErrors": []
+    },
+    {
+      "fixture": "missing",
+      "width": 1280,
+      "documentWidth": 1280,
+      "status": "Sample refresh time unknown",
+      "date": "Oct 11, 2026",
+      "dateColumnReachable": true,
+      "consoleErrors": []
+    },
+    {
+      "fixture": "missing",
+      "width": 390,
+      "documentWidth": 390,
+      "status": "Sample refresh time unknown",
+      "date": "Oct 11, 2026",
+      "dateColumnReachable": true,
+      "consoleErrors": []
+    },
+    {
+      "fixture": "missing",
+      "width": 320,
+      "documentWidth": 320,
+      "status": "Sample refresh time unknown",
+      "date": "Oct 11, 2026",
+      "dateColumnReachable": true,
+      "consoleErrors": []
+    },
+    {
+      "fixture": "unknown",
+      "width": 1280,
+      "documentWidth": 1280,
+      "status": "Sample refresh time unknown",
+      "date": "Oct 11, 2026",
+      "dateColumnReachable": true,
+      "consoleErrors": []
+    },
+    {
+      "fixture": "unknown",
+      "width": 390,
+      "documentWidth": 390,
+      "status": "Sample refresh time unknown",
+      "date": "Oct 11, 2026",
+      "dateColumnReachable": true,
+      "consoleErrors": []
+    },
+    {
+      "fixture": "unknown",
+      "width": 320,
+      "documentWidth": 320,
+      "status": "Sample refresh time unknown",
+      "date": "Oct 11, 2026",
+      "dateColumnReachable": true,
+      "consoleErrors": []
+    }
+  ],
+  "contrast": [
+    {
+      "name": "Body",
+      "foreground": "#141a24",
+      "background": "#ffffff",
+      "ratio": 17.46
+    },
+    {
+      "name": "Secondary",
+      "foreground": "#5a6577",
+      "background": "#ffffff",
+      "ratio": 5.89
+    },
+    {
+      "name": "Secondary on soft",
+      "foreground": "#5a6577",
+      "background": "#f4f6fa",
+      "ratio": 5.45
+    },
+    {
+      "name": "CTA",
+      "foreground": "#ffffff",
+      "background": "#0b5fcc",
+      "ratio": 5.96
+    },
+    {
+      "name": "CTA hover",
+      "foreground": "#ffffff",
+      "background": "#0a54ba",
+      "ratio": 7.02
+    },
+    {
+      "name": "Link/focus on soft",
+      "foreground": "#0a54ba",
+      "background": "#f4f6fa",
+      "ratio": 6.49
+    },
+    {
+      "name": "Restaurant tag",
+      "foreground": "#08683c",
+      "background": "#e7f2ec",
+      "ratio": 5.99
+    },
+    {
+      "name": "Bar tag",
+      "foreground": "#5b3fd4",
+      "background": "#ede9fc",
+      "ratio": 5.69
+    },
+    {
+      "name": "License tag",
+      "foreground": "#0b5fcc",
+      "background": "#e8f0fe",
+      "ratio": 5.2
+    }
+  ]
+}

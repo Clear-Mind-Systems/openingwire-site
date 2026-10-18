@@ -10,6 +10,33 @@ which has its own ARCHITECTURE.md).
 > .claude/skills/architecture-brief/SKILL.md). Staleness check:
 > `git diff c35396c..HEAD --stat`.
 
+## Implementation audit — October 17, 2026
+
+The brief below is a historical architecture snapshot, not evidence of current
+publishing success. An audit of site `f97528e` and producer `8e2be73` found:
+
+- That producer baseline called `pipeline.site_sample --inject` for the homepage,
+  then `pipeline.seo_pages --site` for seven landing pages. It does not have the
+  `PAGE_PROFILES` implementation described below; sitemap `lastmod` is not
+  updated by an ordinary sample-row replacement.
+- The baseline generated row dates omit their year and there is no generated
+  source-refresh timestamp. The frontend now uses neutral sample headings,
+  an explicit unknown-refresh fallback, and a dated archive reference.
+- Site publication is a separate step after report generation. Producer
+  [issue #27](https://github.com/Clear-Mind-Systems/scraper-business/issues/27)
+  remains open for the checkout credential failure; report success does not
+  establish site refresh or deployment success.
+- The site contains eight marketing pages and two legal pages. There is no
+  build step, runtime JavaScript, or site CI workflow.
+
+The [paired producer contract](docs/sample-generation-contract.md) now records
+the interface implemented in scraper PR #35 and site PR #3. The producer's unified
+refresh owns SAMPLE rows, external SAMPLE-FRESHNESS cards, and its JSON sidecar
+across all eight pages. The site only installs the external marker boundaries,
+preserving existing sample rows and the historical unknown card until a real
+refresh. Actual paired tests cover fresh/stale/missing/invalid source evidence.
+These source changes do not establish a successful production refresh or deploy.
+
 ## 1. At a glance
 
 - **Purpose**: convert visitors into subscribers (Stripe payment links) and

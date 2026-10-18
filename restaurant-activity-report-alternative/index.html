@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Restaurant Activity Report Alternative for Texas | OpeningWire</title>
-<meta name="description" content="OpeningWire builds on the same public TABC data as the Restaurant Activity Report, adding classification, dedup, and weekly delivery.">
+<meta name="description" content="Looking for a Restaurant Activity Report alternative? OpeningWire offers weekly Texas restaurant and bar lead feeds from public TABC applications and issued licenses.">
 <link rel="canonical" href="https://openingwire.com/restaurant-activity-report-alternative/">
 <!-- seo-pages:v1 -->
 <style>
-:root{--ink:#141a24;--sub:#5a6577;--acc:#0e6ef2;--acc2:#0a54ba;--bg:#ffffff;--soft:#f4f6fa;--line:#e5e9f0;--good:#0d8a4f}
+:root{--ink:#141a24;--sub:#5a6577;--acc:#0b5fcc;--acc2:#0a54ba;--bg:#ffffff;--soft:#f4f6fa;--line:#e5e9f0;--good:#08683c}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6}
 .wrap{max-width:1040px;margin:0 auto;padding:0 24px}
@@ -68,6 +68,33 @@ footer a{color:var(--sub)}
 .seo-feature{margin-bottom:1.25rem;max-width:70ch}
 .seo-feature h3{margin-bottom:.25rem}
 
+
+/* Static sample presentation; the producer owns the SAMPLE row regions. */
+a{color:var(--acc2)}
+a:focus-visible,.table-scroll:focus-visible{outline:3px solid var(--acc2);outline-offset:4px}
+.sample-freshness{max-width:760px;margin:24px auto;padding:20px;background:var(--soft);border:1px solid var(--sub);border-radius:8px}
+.sample-freshness h3{font-size:1.05rem;margin-bottom:8px}
+.sample-freshness p+p{margin-top:12px}
+.sample-freshness time{font-variant-numeric:tabular-nums}
+.sample-dates{color:var(--sub);max-width:760px;margin:16px auto}
+.table-scroll{max-width:100%;overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+.table-scroll table{min-width:720px;border:0;border-radius:0}
+.table-scroll caption{text-align:left;padding:12px 14px;font-weight:600;color:var(--ink);background:var(--soft)}
+.table-scroll td:first-child{min-width:180px;max-width:300px;overflow-wrap:anywhere}
+.table-scroll td:last-child{min-width:120px}
+.seo-teaser{display:none} /* Legacy promotional text is not a freshness signal. */
+.metro-links{max-width:1040px;margin:16px auto 0;padding:0 24px}
+@media(max-width:760px){header .wrap{flex-wrap:wrap;gap:12px}nav{display:flex;flex-wrap:wrap;gap:10px 18px}nav a{margin:0}.sample-freshness{padding:16px}}
+
+main{max-width:1040px;margin:0 auto;padding:32px 24px}
+main>h1{font-size:2.2rem;line-height:1.2;letter-spacing:-.02em;margin:20px 0}
+.seo-intro{margin-bottom:24px}
+main>h2{text-align:left;font-size:1.5rem;margin-top:28px}
+main .sample-freshness,main .sample-dates{margin-left:0}
+.seo-features{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;padding:32px 0}
+.seo-faq{padding:32px 0}.seo-faq h2{text-align:left}.seo-faq-item{margin-top:24px}
+footer>p{max-width:1040px;margin:0 auto;padding:0 24px}
+@media(max-width:760px){main>h1{font-size:1.8rem}.seo-features{grid-template-columns:1fr}}
 </style>
 <script type="application/ld+json">
 {
@@ -76,18 +103,18 @@ footer a{color:var(--sub)}
  "mainEntity": [
   {
    "@type": "Question",
-   "name": "Is this the same data as TABC's Restaurant Activity Report?",
+   "name": "What sources does OpeningWire use?",
    "acceptedAnswer": {
     "@type": "Answer",
-    "text": "Yes \u2014 the same public TABC pending-application and issued-license filings. OpeningWire adds classification, deduplication, and delivery on top of that public data."
+    "text": "OpeningWire identifies restaurant and bar leads from public Texas Alcoholic Beverage Commission (TABC) liquor-license applications and issuances. These records do not cover every restaurant or establish a venue's opening date."
    }
   },
   {
    "@type": "Question",
-   "name": "What does OpeningWire add that the free report doesn't have?",
+   "name": "What does the subscription include?",
    "acceptedAnswer": {
     "@type": "Answer",
-    "text": "Restaurant/bar classification, one row per real premises instead of per license, pending-application tracking, and a weekly delivered CSV instead of a manual pull."
+    "text": "Weekly CSV feeds organize restaurant and bar leads by territory using TABC applications and issued-license records, with venue categories, location details, and record dates. See the homepage for the features included in each plan."
    }
   },
   {
@@ -95,7 +122,7 @@ footer a{color:var(--sub)}
    "name": "How much does it cost?",
    "acceptedAnswer": {
     "@type": "Answer",
-    "text": "Plans start at $99/month for one metro; see pricing on the homepage."
+    "text": "One-metro plans start at $99 per month. See pricing on the homepage for plan details."
    }
   }
  ]
@@ -105,10 +132,22 @@ footer a{color:var(--sub)}
 <body>
 <main>
   <p><a href="/">&larr; OpeningWire</a></p>
-  <h1>A Faster Alternative to TABC&#x27;s Restaurant Activity Report</h1>
-  <p class="seo-intro">The Texas Alcoholic Beverage Commission publishes its own Restaurant Activity Report, a free public tool for browsing recently licensed retailers. It&#x27;s a genuinely useful starting point — and also raw: every license type mixed together, no restaurant-versus-bar classification, no filtering out off-premise retail or closed applications, and no way to have it delivered to you automatically. OpeningWire is built from the same public TABC filings the Restaurant Activity Report draws on, with the layer distributors, POS resellers, and hospitality suppliers actually need on top: venues classified into restaurant, bar/club, or retail; deduplicated to one row per real premises rather than one row per license; pending applications tracked alongside issued licenses; and the whole feed delivered as a CSV every Monday morning — no manual pulls, no re-filtering the same report every week. Below is a live sample built the same way the weekly feed is: the newest licensed restaurants and bars statewide, already classified and already deduplicated, so what you see here is what a subscriber&#x27;s inbox gets every Monday — not a preview that needs further cleanup before it&#x27;s usable for outreach.</p>
-  <table>
-    <tr><th>Venue</th><th>Type</th><th>Status</th><th>City</th><th>Metro</th><th>Licensed</th></tr>
+  <h1>A Weekly Feed for Restaurant Activity Report Research</h1>
+  <p class="seo-intro">If you use the Restaurant Activity Report to research Texas hospitality businesses, OpeningWire offers a weekly subscription for restaurant and bar prospecting. Its sources are public TABC liquor-license applications and issuances, organized into territory feeds with venue categories and location details. Plans cover Houston, Dallas–Fort Worth, Austin, and San Antonio; the Multi-Territory plan also includes a statewide summary. The sample below shows license records from across Texas. Licensing activity does not establish a venue&#x27;s opening date, and this source does not cover every restaurant.</p>
+  <h2 id="sample-title">Sample license records</h2>
+    <!-- SAMPLE-FRESHNESS:START -->
+    <div class="sample-freshness" id="sample-freshness" aria-labelledby="sample-status-title">
+      <h3 id="sample-status-title">Sample refresh time unknown</h3>
+      <p>A verified source-refresh time for this table is unavailable. Weekly delivery is the subscription schedule, not a statement that this sample is current. Records may be out of date; confirm current license status and opening plans.</p>
+      <p>Archive reference: the <time datetime="2026-08-03">August 3, 2026</time> snapshot contained TABC license issue dates from July 29–31, 2026. This archive reference is not a source-refresh time or an opening date.</p>
+      <p><a href="mailto:founders@openingwire.com?subject=OpeningWire%20sample%20request&amp;body=Please%20send%20an%20available%20sample%20for%20my%20metro%3A%20">Request an available sample for your metro</a>.</p>
+    </div>
+    <!-- SAMPLE-FRESHNESS:END -->
+    <p class="sample-dates" id="sample-dates">Licensed means the TABC license issue date, not the venue’s opening date or the feed’s update time. Status labels reflect the sampled records. TABC records do not cover every restaurant. Scroll the table horizontally on smaller screens.</p>
+    <div class="table-scroll" role="region" aria-labelledby="sample-title" aria-describedby="sample-dates" tabindex="0">
+    <table>
+      <caption>TABC license records — selected sample</caption>
+    <tr><th scope="col">Venue</th><th scope="col">Type</th><th scope="col">Status</th><th scope="col">City</th><th scope="col">Metro</th><th scope="col">Licensed</th></tr>
       <!-- SAMPLE:START -->
       <tr><td>Creole's Restaurant & Lounge</td><td><span class="tag r">Restaurant</span></td><td><span class="tag new">Newly Licensed</span></td><td>Houston</td><td>Houston</td><td>Jul 31</td></tr>
       <tr><td>Town Square Socialhouse</td><td><span class="tag b">Bar / Club</span></td><td><span class="tag new">Newly Licensed</span></td><td>Houston</td><td>Houston</td><td>Jul 31</td></tr>
@@ -128,23 +167,23 @@ footer a{color:var(--sub)}
       <tr class="seo-teaser"><td colspan="6">+ 57 more this week — subscribers see everything</td></tr>
       <!-- SAMPLE:END -->
   </table>
-  <p class="seo-cta"><a href="/#pricing">Get the full statewide feed every Monday
-  — plans from $99/mo &rarr;</a></p>
+    </div>
+  <p class="seo-cta"><a href="/#pricing">See weekly feed plans — one-metro plans from $99/mo →</a></p>
   <section class="seo-features">
-    <div class="seo-feature"><h3>Same public source</h3><p>Built from the same TABC pending-application and issued-license filings the state&#x27;s own report draws on — nothing proprietary, nothing scraped from a paywall.</p></div>
-    <div class="seo-feature"><h3>Classified, not raw</h3><p>Every venue is sorted into restaurant, bar/club, or retail, so you&#x27;re not hand-filtering a mixed license-type export.</p></div>
-    <div class="seo-feature"><h3>Delivered weekly</h3><p>A CSV lands in your inbox every Monday instead of a report you have to remember to re-pull and re-clean.</p></div>
+    <div class="seo-feature"><h3>Public TABC sources</h3><p>Leads are identified through TABC pending applications and issued licenses.</p></div>
+    <div class="seo-feature"><h3>Organized for prospecting</h3><p>Venue categories and location details help suppliers research restaurant and bar prospects in their selected territory.</p></div>
+    <div class="seo-feature"><h3>Weekly subscription</h3><p>CSV email delivery is scheduled for Mondays. The public sample has a separate refresh status, shown above.</p></div>
   </section>
   <section class="seo-faq">
     <h2>Frequently asked questions</h2>
-    <div class="seo-faq-item"><h3>Is this the same data as TABC&#x27;s Restaurant Activity Report?</h3><p>Yes — the same public TABC pending-application and issued-license filings. OpeningWire adds classification, deduplication, and delivery on top of that public data.</p></div>
-    <div class="seo-faq-item"><h3>What does OpeningWire add that the free report doesn&#x27;t have?</h3><p>Restaurant/bar classification, one row per real premises instead of per license, pending-application tracking, and a weekly delivered CSV instead of a manual pull.</p></div>
-    <div class="seo-faq-item"><h3>How much does it cost?</h3><p>Plans start at $99/month for one metro; see pricing on the homepage.</p></div>
+    <div class="seo-faq-item"><h3>What sources does OpeningWire use?</h3><p>OpeningWire identifies restaurant and bar leads from public Texas Alcoholic Beverage Commission (TABC) liquor-license applications and issuances. These records do not cover every restaurant or establish a venue&#x27;s opening date.</p></div>
+    <div class="seo-faq-item"><h3>What does the subscription include?</h3><p>Weekly CSV feeds organize restaurant and bar leads by territory using TABC applications and issued-license records, with venue categories, location details, and record dates. See the homepage for the features included in each plan.</p></div>
+    <div class="seo-faq-item"><h3>How much does it cost?</h3><p>One-metro plans start at $99 per month. See pricing on the homepage for plan details.</p></div>
   </section>
 </main>
 <footer>
   <p><a href="/">Home</a> · <a href="/terms.html">Terms</a> ·
-  <a href="/privacy.html">Privacy</a> · OpeningWire — know before they open.</p>
+  <a href="/privacy.html">Privacy</a> · OpeningWire — Texas restaurant and bar leads from TABC records.</p>
 </footer>
 </body>
 </html>
