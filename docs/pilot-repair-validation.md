@@ -50,14 +50,20 @@ not establish browser layout, live source status, email delivery, or production
 hosting. The prior [October 17 browser evidence](validation.md) retains its
 original date and limitations; it is not a new browser run.
 
-At the October 21 local check, all eight static pages passed, nine consumer
-failure/consistency tests passed, and all six paired producer tests passed.
+At the final October 21 local check, all eight static pages passed, ten consumer
+failure/consistency tests passed, and all seven paired producer tests passed.
 The paired cases include fresh, stale, missing, future-invalid and a newer
-required-source failure after a fresh aggregate ingest, plus malformed marker
-failure before writes. Exact SAMPLE and SAMPLE-FRESHNESS interiors on all eight
+required-source failure after a fresh aggregate ingest, unresolved historical
+closed/currently observed inventory despite fresh sources, and malformed marker
+failure before writes. Synthetic fixtures now include exact source IDs and
+physical Texas state/country, with an actual pending premises fingerprint or
+issued-license link. The checks assert clickable source references, unresolved
+opening labels, observation dates and the distinct Application Filed/License
+Issued labels. Exact SAMPLE and SAMPLE-FRESHNESS interiors on all eight
 pages were also compared to `6b286cb` and remain unchanged. The labelled layout
-fixtures were regenerated outside the repository. No site CI workflow is
-configured; these are local results. Whitespace validation passed.
+fixtures were regenerated outside the repository. No site Actions CI workflow is
+configured; these are local results. PR #4's external Semgrep check passed on
+`35f6e20`; later commits require their own check receipt. Whitespace validation passed.
 
 ## Separate operational milestones
 

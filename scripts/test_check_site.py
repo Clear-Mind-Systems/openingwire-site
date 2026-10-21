@@ -79,6 +79,11 @@ class ProvenanceBundleTests(unittest.TestCase):
         source["last_successful_at"] = "2026-10-22T20:00:00Z"
         self.assertTrue(any("source clock" in e for e in self.errors()))
 
+    def test_unresolved_inventory_cannot_be_cached_as_ready(self):
+        self.metadata["source_readiness"]["quality_review"] = {
+            "reappeared_closed_pending": {"count": 1, "application_ids": ["synthetic-app"]}}
+        self.assertTrue(any("inventory contradicts ready" in e for e in self.errors()))
+
     def test_degraded_artifacts_need_visible_hold_on_every_page(self):
         self.metadata["source_readiness"].update(
             ready=False, status="blocked", reasons=["pending_refresh latest attempt failed"])

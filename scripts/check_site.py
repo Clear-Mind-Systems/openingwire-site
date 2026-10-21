@@ -144,6 +144,14 @@ def provenance_errors(root, sources, marketing):
             raise ValueError("source readiness reasons must be nonempty strings")
         if readiness["ready"] != (not reasons):
             raise ValueError("source readiness reasons contradict its gate")
+        quality = readiness.get("quality_review")
+        if quality is not None:
+            inventory = quality["reappeared_closed_pending"]
+            count, ids = inventory["count"], inventory["application_ids"]
+            if type(count) is not int or count < 0 or not isinstance(ids, list) or count != len(ids):
+                raise ValueError("inventory review evidence is invalid")
+            if count and readiness["ready"]:
+                raise ValueError("unresolved inventory contradicts ready gate")
         source_evidence = readiness.get("sources")
         if not isinstance(source_evidence, dict) or set(source_evidence) != REQUIRED_SOURCES:
             raise ValueError("required source evidence is incomplete")

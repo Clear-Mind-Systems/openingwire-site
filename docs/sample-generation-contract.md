@@ -57,6 +57,7 @@ existing clock fields:
 | `published_at` | Null; HTML always says publication unverified. A push or HTTP 200 is not exact-artifact publication evidence. |
 | `source_freshness` | `fresh`, `stale`, `missing`, or `invalid`, evaluated at generation. Missing/invalid show unknown. |
 | `source_readiness` | Explicit `ready` gate, `ready`/`blocked` status, reasons, and separate evidence for `pending_applications`, `issued_licenses`, and `pending_refresh`. A newer failed attempt blocks readiness even when an older ingest success is fresh. |
+| `source_readiness.quality_review` | Separate inventory evidence. `reappeared_closed_pending` records the count and IDs of currently observed applications linked to historically closed venues; nonzero counts block readiness until reviewed. Source success does not resolve these historical relationships. |
 | `freshness_thresholds_hours` | Source ingest 48 hours; generated artifact 192 hours. Exactly 48 source hours is fresh. |
 | `pages[path]` | `kind`, real venue `row_count`, and `rows_sha256` of UTF-8 venue/teaser rows with LF separators and no final LF. Excludes freshness and marker indentation. |
 
@@ -81,6 +82,9 @@ the visible words **publication and delivery blocked** on every page. Generating
 review artifact does not authorize publishing or sending it. The consumer checks
 all eight page entries, exact row hashes and counts, source evidence, coherent
 archive/generated mode, and the visible hold before accepting a generated bundle.
+When inventory quality blocks output despite fresh sources, the card says source
+or inventory checks are incomplete. It does not falsely report a failed source,
+restore a venue automatically, or infer that a business reopened.
 
 ## Representative rendered HTML — synthetic fixtures only
 
@@ -106,7 +110,7 @@ Stale:
 ```html
     <div class="sample-freshness" id="sample-freshness" aria-labelledby="sample-status-title" data-source-freshness="stale">
       <h3 id="sample-status-title">Sample source data stale</h3>
-      <p>Source data stale: successful ingest older than 48 hours at generation. Source ingest: <time datetime="2026-10-04T13:27:46Z">2026-10-04 13:27:46 UTC</time>. Sample generated: <time datetime="2026-10-17T20:00:00Z">2026-10-17 20:00:00 UTC</time>. Publication: unverified. Required sources incomplete — REVIEW ONLY; publication and delivery blocked. pending_applications: successful refresh stale; issued_licenses: successful refresh stale; pending_refresh: successful refresh stale</p>
+      <p>Source data stale: successful ingest older than 48 hours at generation. Source ingest: <time datetime="2026-10-04T13:27:46Z">2026-10-04 13:27:46 UTC</time>. Sample generated: <time datetime="2026-10-17T20:00:00Z">2026-10-17 20:00:00 UTC</time>. Publication: unverified. Required source or inventory checks incomplete — REVIEW ONLY; publication and delivery blocked. pending_applications: successful refresh stale; issued_licenses: successful refresh stale; pending_refresh: successful refresh stale; ingest: latest successful attempt stale or invalid</p>
       <p>This status is evaluated at generation and does not update between publications. Source ingest is not a venue opening date. Request a current sample if these dates are too old for your needs.</p>
       <p><a href="mailto:founders@openingwire.com?subject=OpeningWire%20sample%20request&amp;body=Please%20send%20an%20available%20sample%20for%20my%20metro%3A%20">Request an available sample for your metro</a>.</p>
     </div>
@@ -117,7 +121,7 @@ Missing:
 ```html
     <div class="sample-freshness" id="sample-freshness" aria-labelledby="sample-status-title" data-source-freshness="missing">
       <h3 id="sample-status-title">Sample refresh time unknown</h3>
-      <p>Source freshness unknown: no valid successful ingest timestamp. Source ingest: unknown. Sample generated: <time datetime="2026-10-17T20:00:00Z">2026-10-17 20:00:00 UTC</time>. Publication: unverified. Required sources incomplete — REVIEW ONLY; publication and delivery blocked. pending_applications: latest attempt missing; pending_applications: successful refresh missing; issued_licenses: latest attempt missing; issued_licenses: successful refresh missing; pending_refresh: latest attempt missing; pending_refresh: successful refresh missing; ingest: latest attempt missing</p>
+      <p>Source freshness unknown: no valid successful ingest timestamp. Source ingest: unknown. Sample generated: <time datetime="2026-10-17T20:00:00Z">2026-10-17 20:00:00 UTC</time>. Publication: unverified. Required source or inventory checks incomplete — REVIEW ONLY; publication and delivery blocked. pending_applications: latest attempt missing; pending_applications: successful refresh missing; issued_licenses: latest attempt missing; issued_licenses: successful refresh missing; pending_refresh: latest attempt missing; pending_refresh: successful refresh missing; ingest: latest attempt missing</p>
       <p>This status is evaluated at generation and does not update between publications. Source ingest is not a venue opening date. Request a current sample if these dates are too old for your needs.</p>
       <p><a href="mailto:founders@openingwire.com?subject=OpeningWire%20sample%20request&amp;body=Please%20send%20an%20available%20sample%20for%20my%20metro%3A%20">Request an available sample for your metro</a>.</p>
     </div>
@@ -126,7 +130,7 @@ Missing:
 Synthetic long-name row for layout testing only:
 
 ```html
-<tr><td>SYNTHETIC Cafe with a deliberately long display name for layout testing</td><td>Restaurant</td><td>Newly Licensed</td><td>Austin</td><td>Austin</td><td>Oct 16, 2026</td></tr>
+<tr><td>SYNTHETIC Cafe with a deliberately long display name for layout testing</td><td>Restaurant</td><td>License Issued</td><td>Austin</td><td>Austin</td><td>Oct 16, 2026</td></tr>
 ```
 
 ## Verification and publication dependency
