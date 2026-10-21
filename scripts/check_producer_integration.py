@@ -57,6 +57,7 @@ class ProducerIntegration(unittest.TestCase):
         cls.producer = importlib.import_module("pipeline.seo_pages")
         cls.schema = importlib.import_module("pipeline.db").SCHEMA
         cls.cfg = importlib.import_module("pipeline.config").load_config()
+        cls.fingerprint = staticmethod(importlib.import_module("pipeline.normalize").fingerprint)
 
     @classmethod
     def tearDownClass(cls):
@@ -76,22 +77,50 @@ class ProducerIntegration(unittest.TestCase):
 
     def seed(self, stamp):
         if stamp is not None:
-            self.conn.execute(
-                "INSERT INTO run_log(job,started_at,finished_at,status) VALUES('ingest',?,?, 'ok')",
-                (stamp, stamp))
+            for job in ("pending_applications", "issued_licenses", "pending_refresh", "ingest"):
+                self.conn.execute(
+                    "INSERT INTO run_log(job,started_at,finished_at,status) VALUES(?,?,?, 'ok')",
+                    (job, stamp, stamp))
         for metro in ("houston", "dfw", "austin", "san-antonio"):
             for stage in ("newly-licensed", "application-pending"):
+                source_id = "synthetic-" + metro + "-" + stage
+                licensed = stage == "newly-licensed"
+                payload = {
+                    "address": f"{len(metro)} {metro} {stage} Fixture St",
+                    "city": "Fixture <City>", "owner": "SYNTHETIC Operator " + metro,
+                    "state": "TX", "country": "United States",
+                    "trade_name": "SYNTHETIC <Cafe> & Long Name " + metro,
+                    "license_id" if licensed else "application_id": source_id,
+                    "license_status" if licensed else "applicationstatus": "Active",
+                }
                 self.conn.execute(
                     "INSERT INTO venues(fingerprint,trade_name,category,stage,metro,city,"
-                    "issue_date,submission_date,first_seen,needs_review) VALUES(?,?,?,?,?,?,?,?,?,?)",
-                    (metro + stage, "SYNTHETIC <Cafe> & Long Name " + metro,
-                     "restaurant", stage, metro, "Fixture <City>",
-                     "2026-10-16" if stage == "newly-licensed" else None,
-                     "2026-10-10", "2026-10-16T15:00:00Z", 0))
+                    "issue_date,submission_date,first_seen,needs_review,address,owner,license_id) "
+                    "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    (self.fingerprint(payload["address"], payload["city"], payload["owner"]),
+                     payload["trade_name"], "restaurant", stage, metro, payload["city"],
+                     "2026-10-16" if licensed else None,
+                     "2026-10-10", "2026-10-16T15:00:00Z", 0,
+                     payload["address"], payload["owner"], source_id if licensed else None))
+                self.conn.execute(
+                    "INSERT INTO raw_records(source,source_id,payload,fetched_at) VALUES(?,?,?,?)",
+                    ("issued_licenses" if licensed else "pending_applications", source_id,
+                     json.dumps(payload), "2026-10-16T15:00:00Z"))
 
-    def assert_state(self, state, stamp):
+    def assert_state(self, state, stamp, *, later_failure=False, inventory_review=False):
         before = files(self.target)
         self.seed(stamp)
+        if later_failure:
+            self.conn.execute(
+                "INSERT INTO run_log(job,started_at,finished_at,status) "
+                "VALUES('pending_refresh', '2026-10-17T19:30:00Z', '2026-10-17T19:31:00Z', 'error')")
+        if inventory_review:
+            self.conn.execute("UPDATE venues SET stage='application-closed' "
+                              "WHERE stage='application-pending' AND metro='houston'")
+            self.conn.execute(
+                "INSERT INTO source_observations(source,source_id,payload,observed_at) "
+                "SELECT source,source_id,payload,? FROM raw_records "
+                "WHERE source_id='synthetic-houston-application-pending'", (stamp,))
         self.assertTrue(self.producer.refresh_site(self.target, self.conn, self.cfg, now=NOW))
         metadata = json.loads((self.target / "data/sample-metadata.json").read_text())
         self.assertEqual(metadata["source_freshness"], state)
@@ -99,6 +128,10 @@ class ProducerIntegration(unittest.TestCase):
         self.assertEqual(metadata["source_ingest_succeeded_at"], stamp)
         self.assertIsNone(metadata["published_at"])
         self.assertEqual(metadata["contract_version"], 1)
+        ready = state == "fresh" and not later_failure and not inventory_review
+        self.assertEqual(metadata["source_readiness"]["ready"], ready)
+        if inventory_review:
+            self.assertEqual(metadata["source_readiness"]["quality_review"]["reappeared_closed_pending"]["count"], 1)
         self.assertEqual(metadata["freshness_thresholds_hours"],
                          {"source_ingest": 48, "generated_artifact": 192})
         self.assertEqual(len(self.producer.SAMPLE_PAGE_PATHS), 8)
@@ -122,6 +155,7 @@ class ProducerIntegration(unittest.TestCase):
                 self.assertIn("sample-status-title", document.ids)
                 self.assertIn("does not update between publications", card.text())
                 self.assertIn("Publication: unverified", card.text())
+                self.assertEqual("publication and delivery blocked" in card.text(), not ready)
                 self.assertIn("Sample generated: 2026-10-17 20:00:00 UTC", card.text())
                 self.assertTrue(any(n.tag == "a" and n.attrs.get("href", "").startswith(
                     "mailto:founders@openingwire.com?subject=") for n in card.nodes()))
@@ -137,9 +171,13 @@ class ProducerIntegration(unittest.TestCase):
                 self.assertIn("&lt;cafe&gt;", sample(result).lower())
                 self.assertNotIn("<cafe>", sample(result).lower())
                 self.assertIn("2026", sample(result))
-                rows = sample(result).strip("\n")
-                # The last line is marker indentation, not producer row content.
-                rows = rows.rsplit("\n", 1)[0]
+                self.assertIn("https://data.texas.gov/resource/", sample(result))
+                self.assertIn("Opening unresolved", sample(result))
+                self.assertIn("First observed:", sample(result))
+                self.assertIn("Application Filed" if metadata["pages"][path]["kind"] == "pending"
+                              else "License Issued", sample(result))
+                # Exclude the initial LF and final marker indentation only.
+                rows = sample(result)[1:].rsplit("\n", 1)[0]
                 self.assertEqual(hashlib.sha256(rows.encode()).hexdigest(),
                                  metadata["pages"][path]["rows_sha256"])
                 venue_rows = [n for n in Document(sample(result)).nodes if n.tag == "tr"
@@ -181,6 +219,12 @@ class ProducerIntegration(unittest.TestCase):
 
     def test_future_invalid_actual_pair(self):
         self.assert_state(*STATES[3])
+
+    def test_newer_required_source_failure_cannot_hide_behind_fresh_ingest(self):
+        self.assert_state(*STATES[0], later_failure=True)
+
+    def test_fresh_sources_with_unresolved_closed_inventory_remain_blocked(self):
+        self.assert_state(*STATES[0], inventory_review=True)
 
     def test_malformed_region_fails_before_any_write(self):
         path = self.target / self.producer.SAMPLE_PAGE_PATHS[-1]

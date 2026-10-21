@@ -45,6 +45,7 @@ and link checks with the standard library:
 
 ```bash
 python3 scripts/check_site.py
+python3 scripts/test_check_site.py
 ../scraper-business/.venv/bin/python scripts/check_producer_integration.py --producer-root ../scraper-business
 python3 -m http.server 8000 --bind 127.0.0.1
 ```
@@ -55,3 +56,10 @@ the reviewed widths, temporary metadata fixtures, before/after screenshots,
 and producer rendering-test results. Production sample rows must stay unchanged
 in static frontend changes; the checker's `--baseline` option accepts the
 reviewed starting commit for such a change.
+
+October 21 repair review keeps the archived public sample rows and unknown-refresh
+cards intact. Licensing signals now explicitly include existing venues and
+operator changes, and archived rows are not presented as verified contacts.
+Generated review bundles must match their sidecar hashes/counts on every page
+and expose required-source failure holds. See
+[repair validation and launch decisions](docs/pilot-repair-validation.md).
