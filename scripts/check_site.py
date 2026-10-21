@@ -8,6 +8,8 @@ outside the checkout. No source pages or generated sample rows are changed.
 import argparse
 from collections import Counter
 from dataclasses import dataclass, field
+from datetime import datetime
+import hashlib
 from html.parser import HTMLParser
 import json
 from pathlib import Path
@@ -21,6 +23,7 @@ BASELINE = "f97528e7fd3350782da46bc85450c10a7623ce59"
 ORIGIN = "https://openingwire.com"
 START, END = "<!-- SAMPLE:START -->", "<!-- SAMPLE:END -->"
 FRESH_START, FRESH_END = "<!-- SAMPLE-FRESHNESS:START -->", "<!-- SAMPLE-FRESHNESS:END -->"
+REQUIRED_SOURCES = {"pending_applications", "issued_licenses", "pending_refresh"}
 VOID = set("area base br col embed hr img input link meta param source track wbr".split())
 
 
@@ -109,6 +112,85 @@ def faq_objects(value):
             yield from faq_objects(child)
 
 
+def provenance_errors(root, sources, marketing):
+    """Verify the complete generated bundle, without inferring deployment.
+
+    The archived fallback deliberately has no sidecar. Generated cards require
+    one matching sidecar for all eight pages, including completeness evidence.
+    Hashes identify producer rows, not opening status or business qualification.
+    """
+    generated = {path for path in marketing if Document(sources[path]).ids.get(
+        "sample-freshness", Node("missing")).attrs.get("data-source-freshness")}
+    metadata_path = root / "data/sample-metadata.json"
+    if not generated:
+        return ["orphan sample metadata without generated cards"] if metadata_path.exists() else []
+    errors = []
+    if generated != marketing:
+        errors.append("generated and archived sample modes are mixed across pages")
+    try:
+        metadata = json.loads(metadata_path.read_text())
+        if not isinstance(metadata, dict):
+            raise ValueError("metadata must be an object")
+        pages = metadata["pages"]
+        readiness = metadata["source_readiness"]
+        if not isinstance(pages, dict) or set(pages) != marketing:
+            raise ValueError("metadata page inventory differs from the eight pages")
+        if not isinstance(readiness, dict) or type(readiness.get("ready")) is not bool:
+            raise ValueError("source readiness needs an explicit boolean")
+        if readiness.get("status") != ("ready" if readiness["ready"] else "blocked"):
+            raise ValueError("source readiness status contradicts its gate")
+        reasons = readiness.get("reasons")
+        if not isinstance(reasons, list) or any(not isinstance(r, str) or not r for r in reasons):
+            raise ValueError("source readiness reasons must be nonempty strings")
+        if readiness["ready"] != (not reasons):
+            raise ValueError("source readiness reasons contradict its gate")
+        source_evidence = readiness.get("sources")
+        if not isinstance(source_evidence, dict) or set(source_evidence) != REQUIRED_SOURCES:
+            raise ValueError("required source evidence is incomplete")
+        generated_at = datetime.strptime(metadata["generated_at"], "%Y-%m-%dT%H:%M:%SZ")
+        threshold = metadata["freshness_thresholds_hours"]["source_ingest"]
+        if type(threshold) not in {int, float} or threshold != 48:
+            raise ValueError("unsupported source freshness threshold")
+        if readiness["ready"] and readiness.get("latest_ingest_status") != "ok":
+            raise ValueError("latest ingest status contradicts ready gate")
+        for name, evidence in source_evidence.items():
+            if not isinstance(evidence, dict) or evidence.get("status") not in {"fresh", "stale", "missing", "invalid"}:
+                raise ValueError(f"{name} source evidence has an invalid freshness state")
+            if readiness["ready"] and (evidence["status"] != "fresh" or evidence.get("latest_status") != "ok"):
+                raise ValueError(f"{name} source contradicts ready gate")
+            if evidence["status"] in {"fresh", "stale"}:
+                success = datetime.strptime(evidence["last_successful_at"], "%Y-%m-%dT%H:%M:%SZ")
+                age_hours = (generated_at - success).total_seconds() / 3600
+                expected = "fresh" if 0 <= age_hours <= threshold else "stale"
+                if age_hours < 0 or evidence["status"] != expected:
+                    raise ValueError(f"{name} freshness contradicts source clock")
+                if evidence.get("latest_status") == "ok" and evidence.get("latest_attempt_at") != evidence["last_successful_at"]:
+                    raise ValueError(f"{name} latest success clock is inconsistent")
+        for path in generated:
+            item = pages[path]
+            interior = sample(sources[path])
+            if not interior.startswith("\n") or "\n" not in interior[1:]:
+                raise ValueError(f"{path}: generated row boundaries are invalid")
+            rows = interior[1:].rsplit("\n", 1)[0]
+            digest = hashlib.sha256(rows.encode()).hexdigest()
+            if item.get("rows_sha256") != digest:
+                errors.append(f"{path}: sample rows differ from metadata hash")
+            venue_rows = [n for n in Document(rows).nodes if n.tag == "tr"
+                          and not n.has_class("seo-teaser") and not n.has_class("sample-freshness")]
+            if type(item.get("row_count")) is not int or item["row_count"] != len(venue_rows):
+                errors.append(f"{path}: sample row count differs from metadata")
+            card = Document(sources[path]).ids["sample-freshness"].text()
+            if not readiness["ready"] and "publication and delivery blocked" not in card:
+                errors.append(f"{path}: blocked sources lack visible publication/delivery hold")
+            if readiness["ready"] and "publication and delivery blocked" in card:
+                errors.append(f"{path}: ready sources contradict a visible blocked status")
+        if metadata.get("published_at") is not None:
+            errors.append("publication must remain unverified in local producer metadata")
+    except (OSError, ValueError, KeyError, TypeError, AttributeError) as exc:
+        errors.append(f"missing/invalid producer bundle: {exc}")
+    return errors
+
+
 def check_site(root, baseline):
     errors = []
 
@@ -123,6 +205,8 @@ def check_site(root, baseline):
     sources = {str(p.relative_to(root)): p.read_bytes().decode() for p in root.rglob("*.html") if ".git" not in p.parts}
     docs = {p: Document(source) for p, source in sources.items()}
     require({p for p, s in sources.items() if START in s} == marketing, "marketing marker page inventory changed")
+    if marketing <= sources.keys():
+        errors.extend(provenance_errors(root, sources, marketing))
 
     for path, doc in docs.items():
         prefix = f"{path}: "
@@ -201,11 +285,20 @@ def check_site(root, baseline):
                 marker = f"<!-- {block}:{boundary} -->"
                 require(source.count(marker) == old.count(marker), prefix + f"changed {marker}")
             region = rf"<!-- {block}:START -->.*?<!-- {block}:END -->"
-            require(re.findall(region, source, re.S) == re.findall(region, old, re.S), prefix + f"producer-owned {block} bytes changed")
+            # The paired producer owns this one conservative label migration.
+            # All marker boundaries, destinations and remaining bytes stay fixed.
+            old_regions = [value.replace("New openings by metro:", "TABC license records by metro:")
+                           .replace("Sell to new restaurants and bars:", "Explore TABC licensing signals:")
+                           for value in re.findall(region, old, re.S)]
+            require(re.findall(region, source, re.S) == old_regions, prefix + f"producer-owned {block} bytes changed")
         canonicals = [n.attrs.get("href") for n in doc.nodes if n.tag == "link" and n.attrs.get("rel") == "canonical"]
         require(canonicals == [ORIGIN + public_path(path)], prefix + "canonical URL does not match page")
         for element_id, tag in (("sample-title", "h2"), ("sample-status-title", "h3"), ("sample-dates", "p")):
             require(element_id in doc.ids and doc.ids[element_id].tag == tag, prefix + f"missing accessible {tag}#{element_id}")
+        limits = doc.ids.get("signal-limits")
+        require(limits is not None and all(term in limits.text().lower() for term in
+                ("existing venue", "ownership", "separate supporting evidence", "verified business contacts")),
+                prefix + "missing conservative licensing-signal and contact limitations")
         status = doc.ids.get("sample-freshness")
         require(status is not None and status.tag == "div" and status.has_class("sample-freshness") and status.attrs.get("aria-labelledby") == "sample-status-title", prefix + "missing labelled freshness explanation")
         if status:

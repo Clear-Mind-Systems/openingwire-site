@@ -45,7 +45,9 @@ output before publishing. The site adds no second writer or deployment path.
 
 ## Fields and clocks
 
-The implementation uses the producer's version-1 JSON contract, unchanged:
+The implementation uses the producer's version-1 JSON contract. The October 21
+repair adds required-source readiness to generated bundles without changing the
+existing clock fields:
 
 | Field | Meaning |
 | --- | --- |
@@ -54,6 +56,7 @@ The implementation uses the producer's version-1 JSON contract, unchanged:
 | `generated_at` | Actual rendering time for this payload/provenance version; retained for identical output. Must follow valid source success. |
 | `published_at` | Null; HTML always says publication unverified. A push or HTTP 200 is not exact-artifact publication evidence. |
 | `source_freshness` | `fresh`, `stale`, `missing`, or `invalid`, evaluated at generation. Missing/invalid show unknown. |
+| `source_readiness` | Explicit `ready` gate, `ready`/`blocked` status, reasons, and separate evidence for `pending_applications`, `issued_licenses`, and `pending_refresh`. A newer failed attempt blocks readiness even when an older ingest success is fresh. |
 | `freshness_thresholds_hours` | Source ingest 48 hours; generated artifact 192 hours. Exactly 48 source hours is fresh. |
 | `pages[path]` | `kind`, real venue `row_count`, and `rows_sha256` of UTF-8 venue/teaser rows with LF separators and no final LF. Excludes freshness and marker indentation. |
 
@@ -70,6 +73,15 @@ or commit dates. The next producer refresh rebuilds actual provenance; operators
 use the producer's read-only freshness checker for current health. Readers see
 only the rendered observation and absolute dates, never a claim of live health.
 
+All three required source jobs must have current successful evidence for the
+generation gate to pass. A recent zero-record incremental ingest does not prove
+that a full pending snapshot succeeded. The producer defaults to blocking output
+when readiness fails; explicitly requested local degraded review artifacts carry
+the visible words **publication and delivery blocked** on every page. Generating a
+review artifact does not authorize publishing or sending it. The consumer checks
+all eight page entries, exact row hashes and counts, source evidence, coherent
+archive/generated mode, and the visible hold before accepting a generated bundle.
+
 ## Representative rendered HTML — synthetic fixtures only
 
 The following are emitted by the actual producer renderer for labelled local
@@ -83,7 +95,7 @@ Fresh:
 ```html
     <div class="sample-freshness" id="sample-freshness" aria-labelledby="sample-status-title" data-source-freshness="fresh">
       <h3 id="sample-status-title">Sample source ingest recorded</h3>
-      <p>Source ingest within 48 hours at generation. Source ingest: <time datetime="2026-10-17T19:00:00Z">2026-10-17 19:00:00 UTC</time>. Sample generated: <time datetime="2026-10-17T20:00:00Z">2026-10-17 20:00:00 UTC</time>. Publication: unverified.</p>
+      <p>Source ingest within 48 hours at generation. Source ingest: <time datetime="2026-10-17T19:00:00Z">2026-10-17 19:00:00 UTC</time>. Sample generated: <time datetime="2026-10-17T20:00:00Z">2026-10-17 20:00:00 UTC</time>. Publication: unverified. Required sources complete at generation.</p>
       <p>This status is evaluated at generation and does not update between publications. Source ingest is not a venue opening date. Request a current sample if these dates are too old for your needs.</p>
       <p><a href="mailto:founders@openingwire.com?subject=OpeningWire%20sample%20request&amp;body=Please%20send%20an%20available%20sample%20for%20my%20metro%3A%20">Request an available sample for your metro</a>.</p>
     </div>
@@ -94,7 +106,7 @@ Stale:
 ```html
     <div class="sample-freshness" id="sample-freshness" aria-labelledby="sample-status-title" data-source-freshness="stale">
       <h3 id="sample-status-title">Sample source data stale</h3>
-      <p>Source data stale: successful ingest older than 48 hours at generation. Source ingest: <time datetime="2026-10-04T13:27:46Z">2026-10-04 13:27:46 UTC</time>. Sample generated: <time datetime="2026-10-17T20:00:00Z">2026-10-17 20:00:00 UTC</time>. Publication: unverified.</p>
+      <p>Source data stale: successful ingest older than 48 hours at generation. Source ingest: <time datetime="2026-10-04T13:27:46Z">2026-10-04 13:27:46 UTC</time>. Sample generated: <time datetime="2026-10-17T20:00:00Z">2026-10-17 20:00:00 UTC</time>. Publication: unverified. Required sources incomplete — REVIEW ONLY; publication and delivery blocked. pending_applications: successful refresh stale; issued_licenses: successful refresh stale; pending_refresh: successful refresh stale</p>
       <p>This status is evaluated at generation and does not update between publications. Source ingest is not a venue opening date. Request a current sample if these dates are too old for your needs.</p>
       <p><a href="mailto:founders@openingwire.com?subject=OpeningWire%20sample%20request&amp;body=Please%20send%20an%20available%20sample%20for%20my%20metro%3A%20">Request an available sample for your metro</a>.</p>
     </div>
@@ -105,7 +117,7 @@ Missing:
 ```html
     <div class="sample-freshness" id="sample-freshness" aria-labelledby="sample-status-title" data-source-freshness="missing">
       <h3 id="sample-status-title">Sample refresh time unknown</h3>
-      <p>Source freshness unknown: no valid successful ingest timestamp. Source ingest: unknown. Sample generated: <time datetime="2026-10-17T20:00:00Z">2026-10-17 20:00:00 UTC</time>. Publication: unverified.</p>
+      <p>Source freshness unknown: no valid successful ingest timestamp. Source ingest: unknown. Sample generated: <time datetime="2026-10-17T20:00:00Z">2026-10-17 20:00:00 UTC</time>. Publication: unverified. Required sources incomplete — REVIEW ONLY; publication and delivery blocked. pending_applications: latest attempt missing; pending_applications: successful refresh missing; issued_licenses: latest attempt missing; issued_licenses: successful refresh missing; pending_refresh: latest attempt missing; pending_refresh: successful refresh missing; ingest: latest attempt missing</p>
       <p>This status is evaluated at generation and does not update between publications. Source ingest is not a venue opening date. Request a current sample if these dates are too old for your needs.</p>
       <p><a href="mailto:founders@openingwire.com?subject=OpeningWire%20sample%20request&amp;body=Please%20send%20an%20available%20sample%20for%20my%20metro%3A%20">Request an available sample for your metro</a>.</p>
     </div>
@@ -124,6 +136,7 @@ from actual producer integration:
 
 ```bash
 python3 scripts/check_site.py
+python3 scripts/test_check_site.py
 python3 scripts/check_site.py --write-fixtures /tmp/openingwire-layout-fixtures
 ../scraper-business/.venv/bin/python scripts/check_producer_integration.py --producer-root ../scraper-business
 ```

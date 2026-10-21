@@ -76,9 +76,10 @@ class ProducerIntegration(unittest.TestCase):
 
     def seed(self, stamp):
         if stamp is not None:
-            self.conn.execute(
-                "INSERT INTO run_log(job,started_at,finished_at,status) VALUES('ingest',?,?, 'ok')",
-                (stamp, stamp))
+            for job in ("pending_applications", "issued_licenses", "pending_refresh", "ingest"):
+                self.conn.execute(
+                    "INSERT INTO run_log(job,started_at,finished_at,status) VALUES(?,?,?, 'ok')",
+                    (job, stamp, stamp))
         for metro in ("houston", "dfw", "austin", "san-antonio"):
             for stage in ("newly-licensed", "application-pending"):
                 self.conn.execute(
@@ -89,9 +90,13 @@ class ProducerIntegration(unittest.TestCase):
                      "2026-10-16" if stage == "newly-licensed" else None,
                      "2026-10-10", "2026-10-16T15:00:00Z", 0))
 
-    def assert_state(self, state, stamp):
+    def assert_state(self, state, stamp, *, later_failure=False):
         before = files(self.target)
         self.seed(stamp)
+        if later_failure:
+            self.conn.execute(
+                "INSERT INTO run_log(job,started_at,finished_at,status) "
+                "VALUES('pending_refresh', '2026-10-17T19:30:00Z', '2026-10-17T19:31:00Z', 'error')")
         self.assertTrue(self.producer.refresh_site(self.target, self.conn, self.cfg, now=NOW))
         metadata = json.loads((self.target / "data/sample-metadata.json").read_text())
         self.assertEqual(metadata["source_freshness"], state)
@@ -99,6 +104,8 @@ class ProducerIntegration(unittest.TestCase):
         self.assertEqual(metadata["source_ingest_succeeded_at"], stamp)
         self.assertIsNone(metadata["published_at"])
         self.assertEqual(metadata["contract_version"], 1)
+        ready = state == "fresh" and not later_failure
+        self.assertEqual(metadata["source_readiness"]["ready"], ready)
         self.assertEqual(metadata["freshness_thresholds_hours"],
                          {"source_ingest": 48, "generated_artifact": 192})
         self.assertEqual(len(self.producer.SAMPLE_PAGE_PATHS), 8)
@@ -122,6 +129,7 @@ class ProducerIntegration(unittest.TestCase):
                 self.assertIn("sample-status-title", document.ids)
                 self.assertIn("does not update between publications", card.text())
                 self.assertIn("Publication: unverified", card.text())
+                self.assertEqual("publication and delivery blocked" in card.text(), not ready)
                 self.assertIn("Sample generated: 2026-10-17 20:00:00 UTC", card.text())
                 self.assertTrue(any(n.tag == "a" and n.attrs.get("href", "").startswith(
                     "mailto:founders@openingwire.com?subject=") for n in card.nodes()))
@@ -137,9 +145,8 @@ class ProducerIntegration(unittest.TestCase):
                 self.assertIn("&lt;cafe&gt;", sample(result).lower())
                 self.assertNotIn("<cafe>", sample(result).lower())
                 self.assertIn("2026", sample(result))
-                rows = sample(result).strip("\n")
-                # The last line is marker indentation, not producer row content.
-                rows = rows.rsplit("\n", 1)[0]
+                # Exclude the initial LF and final marker indentation only.
+                rows = sample(result)[1:].rsplit("\n", 1)[0]
                 self.assertEqual(hashlib.sha256(rows.encode()).hexdigest(),
                                  metadata["pages"][path]["rows_sha256"])
                 venue_rows = [n for n in Document(sample(result)).nodes if n.tag == "tr"
@@ -181,6 +188,9 @@ class ProducerIntegration(unittest.TestCase):
 
     def test_future_invalid_actual_pair(self):
         self.assert_state(*STATES[3])
+
+    def test_newer_required_source_failure_cannot_hide_behind_fresh_ingest(self):
+        self.assert_state(*STATES[0], later_failure=True)
 
     def test_malformed_region_fails_before_any_write(self):
         path = self.target / self.producer.SAMPLE_PAGE_PATHS[-1]
